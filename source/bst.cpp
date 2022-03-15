@@ -16,15 +16,15 @@ class bst{
         
         //L-VALUE
         //constructor for Node when the tree is empty called by insert
-        explicit Node(const std::pair<const key_type,value_type> &x) : pair_data{x}, parent{nullptr} {std::cout << "l-value\n";} 
+        explicit Node(const std::pair<const key_type,value_type> &x) : pair_data{x}, parent{nullptr} { std::cout << "l-value\n";} 
         //constructor called by insert when the tree has already a node
         Node(const std::pair<const key_type,value_type> &x, Node *p) : pair_data{x}, parent{p} { std::cout << "l-value\n"; }
 
         //R-VALUE
         //constructor for Node when the tree is empty called by insert 
-        explicit Node( std::pair<const key_type,value_type>&&x) : pair_data{std::move(x)} { std::cout << "r-value" << std::endl;}
+        explicit Node( std::pair<const key_type,value_type>&&x) : pair_data{std::move(x)}, parent(nullptr) { std::cout << "r-value" << std::endl;}
         //constructor called by insert when the tree has already a node
-        Node(std::pair<const key_type,value_type>&&x, Node *p) : parent{p},pair_data{std::move(x)} {std::cout << "r-value" << std::endl;}
+        Node(std::pair<const key_type,value_type>&&x, Node *p) : pair_data{std::move(x)}, parent{p} {std::cout << "r-value" << std::endl;}
 
     };
 
@@ -50,7 +50,7 @@ class bst{
                 //return std::pair<iterator, bool>{it,true}; //we return the new node added with an iterator
             }
 
-            //if there is a root node
+            //if there is a root node need to loop to decide in which part to insert the new node
             while(tmp){
                 if(op(x.first, tmp->pair_data.first))//if x.key < tmp.key (root) retrun true
                 {
@@ -198,7 +198,7 @@ public:
     reference operator*() const {return current->pair_data;}
     pointer operator->() const {return &**this;}
 
-    //pre-increment
+    //pre-increment accordin to the navigation fo the tree from left to right
     _Iterator& operator++(){
         if(!current){  //current == nullptr
             return *this;
