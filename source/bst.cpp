@@ -3,12 +3,13 @@
 #include <iterator> // std::forward_iterator_tag;
 #include <memory> //std::unique_pytr
 #include <utility> // std::move
+using namespace std;
 
-template<typename key_type, typename value_type, typename OP = std::less<key_type>>
+template<typename key_type, typename val_type, typename OP = std::less<key_type>>
 class bst{
 
     struct Node{
-        std::pair<const key_type, value_type> pair_data;
+        std::pair<const key_type, val_type> pair_data;
         std::unique_ptr<Node> left;
         std::unique_ptr<Node> right;
 
@@ -16,15 +17,15 @@ class bst{
         
         //L-VALUE
         //constructor for Node when the tree is empty called by insert
-        explicit Node(const std::pair<const key_type,value_type> &x) : pair_data{x}, parent{nullptr} { std::cout << "l-value\n";} 
+        explicit Node(const std::pair<const key_type,val_type> &x) : pair_data{x}, parent{nullptr} { std::cout << "l-value\n";} 
         //constructor called by insert when the tree has already a node
-        Node(const std::pair<const key_type,value_type> &x, Node *p) : pair_data{x}, parent{p} { std::cout << "l-value\n"; }
+        Node(const std::pair<const key_type,val_type> &x, Node *p) : pair_data{x}, parent{p} { std::cout << "l-value\n"; }
 
         //R-VALUE
         //constructor for Node when the tree is empty called by insert 
-        explicit Node( std::pair<const key_type,value_type>&&x) : pair_data{std::move(x)}, parent(nullptr) { std::cout << "r-value" << std::endl;}
+        explicit Node( std::pair<const key_type,val_type>&&x) : pair_data{std::move(x)}, parent(nullptr) { std::cout << "r-value" << std::endl;}
         //constructor called by insert when the tree has already a node
-        Node(std::pair<const key_type,value_type>&&x, Node *p) : pair_data{std::move(x)}, parent{p} {std::cout << "r-value" << std::endl;}
+        Node(std::pair<const key_type,val_type>&&x, Node *p) : pair_data{std::move(x)}, parent{p} {std::cout << "r-value" << std::endl;}
 
     };
 
@@ -37,72 +38,48 @@ class bst{
         }
     }
 
-    //INSERT FORWARDING FUNCTION DECLARED AS PRIVATE
-    template < typename P>
-    std::pair<iterator,bool> _insert(P &&x){ //forwarding is not a n r-value
-        auto tmp = root_node.get();
-
-        if(!tmp){//tmp ==nullptr there is no root node
-            root_node.reset(new Node{std::forward<P>(x)}); //this time we call  explicit node constructor (l or r ccording to the type passed with forwarding)
-            return
-            /** @todo  implement the retrunr using the iterator over the bst tree*/
-            //iterator it{root.get()};
-            //return std::pair<iterator, bool>{it,true}; //we return the new node added with an iterator
-        }
-
-        //if there is a root node need to loop to decide in which part to insert the new node
-        while(tmp){
-            if(op(x.first, tmp->pair_data.first))//if x.key < tmp.key (root) return true
-            {
-                if (!tmp->left) {//tmp->left == nullptr
-                    tmp->left.reset(new node{std::forward<P>(x), tmp}); //we call the second constructor in which we set the parent pointer (l or r according o the type passed with forwarding)
-                    return;
-                    /** @todo implment the retrun with the iterator over the bst*/
-                }
-                else
-                {
-                    tmp = tmp->left.get();
-                }
-            }
-
-            else if(op(tmp->pair_data.first, x.first))//if tmp.key(root) < x.key 
-            {
-                if (!tmp->right)// tmp-> right == nullptr
-                {
-                    tmp->right.reset(new Node{std::forward<P>(x), tmp});//we call the second constructor in which we set the parent pointer
-                    return;
-                    /** @todo implement the retrun usign the itrator to the bst tree*/
-                }
-                else
-                {
-                    tmp = tmp->right.get();
-                }
-            }
-
-            else{ //tmp.key == x.key
-                return;
-                /** @todo retrun nothing , retrun the iteraor at the tmp node there s no need ot inser t
-                 * a new node bacuase the key is equal*/
-
-            }
-        }
-    }
-    
     public:
         std::unique_ptr<Node> root_node;
         std::size_t tree_size;
         OP op; //Operator
         
-        //DEFAULT CONSTRUCTOR AND DESTRUCTOR
+        //DEFAULT CONSTRUCTOR AND DESTRUCTOR____________________________________________________________________________
         bst() = default;
         ~bst() noexcept = default; //the default is enough because we don't have raw pointer for the bst class
 
-        //TEMPLATED CLASS FOR THE ITERATOR, I want the iterator to reference the pair data!!
+        //TEMPLATED CLASS FOR THE ITERATOR, I want the iterator to reference the pair data!!_____________________________
         template <typename O>
         class _Iterator;
 
-        using iterator = _Iterator<std::pair<const key_type, value_type> >; //we pass the templated pair
-        using const_iterator = _Iterator<const std::pair<const key_type, value_type> >; // we pass the const templated pair
+        using iterator = _Iterator<std::pair<const key_type, val_type> >; //we pass the templated pair
+        using const_iterator = _Iterator<const std::pair<const key_type, val_type> >; // we pass the const templated pair
+
+        //BEGIN FOR THE ITERATOR noexcept because we are not acquiring resources_____________________________________________
+        /** @todo retutn the left ost node!!*/
+        iterator begin() noexcept {
+            Node* tmp = root_node.get();
+            while(tmp->left){
+                tmp = tmp->left.get();
+            }
+            return iterator{tmp};
+        }
+        const_iterator begin() const noexcept {
+            Node* tmp = root_node.get();
+            while(tmp->left){
+                tmp = tmp->left.get();
+            }
+            return const_iterator{tmp};
+        }
+        const_iterator cbegin() const noexcept {return begin();} 
+
+        //END FOR THE ITERATOR noexcept because we are not acquairing resources_________________________________________________
+        iterator end() noexcept {return iterator{nullptr};}
+        const_iterator end() const noexcept { return const_iterator{nullptr};}
+        const_iterator cend() const noexcept { return end();};
+
+        //FIND FOR THE ITERATOR_________________________________________________________________________________________________
+        iterator find(const key_type& x);
+        const_iterator find(const key_type& x)const;
 
         //_______________________________________________________________________________________________________________________
         //COPY AND MOVE SEMANTICS FOR THE BST
@@ -130,35 +107,63 @@ class bst{
         }
         //________________________________________________________________________________________________________________________
 
-        //INSERT here we define 2 insert functions calling the private function insert which uses the forwarding:
-        //L-value
-        std::pair<iterator,bool> insert (const std::pair<const key_type, value_type>& x){return _insert(x);}
-        //R-Value
-        std::pair<iterator,bool> insert (std::pair<const key_type, value_type>&& x){return _insert(std::move(x));}
+        //INSERT here we define 2 insert functions calling the function_insert which uses the forwarding:
+        //INSERT FORWARDING FUNCTION DECLARED AS PRIVATE AND DEFINED OUTSIDE THE CLASS AFTER THE ITERATOR
+        template <typename P> std::pair<iterator,bool> _insert(P &&x){ //forwarding is not a n r-value
+            auto tmp = root_node.get();    
+            //if there is a node we have to loop to decide in which point insert the new one
+            while(tmp){
+                if(op(x.first, tmp->pair_data.first))//*********if x.key < tmp.key (root) return true
+                {
+                    if (!tmp->left) {//tmp->left == nullptr
+                        tmp->left.reset(new Node{std::forward<P>(x), tmp}); //we call the second constructor in which we set the parent pointer (l or r according o the type passed with forwarding)
+                        ++ tree_size;
+                        iterator my_iterator{tmp->left.get()};
+                        return std::pair<iterator, bool>{my_iterator, true}; //true because we allocate a new node
+                    }
+                    else
+                    {
+                        tmp = tmp->left.get();
+                    }
+                }
+                else if(op(tmp->pair_data.first, x.first))//*********if x-key > tmp.key
+                {
+                    if (!tmp->right)// tmp-> right == nullptr
+                    {
+                        tmp->right.reset(new Node{std::forward<P>(x), tmp});//we call the second constructor in which we set the parent pointer
+                        ++ tree_size;
+                        iterator my_iterator{tmp->right.get()};
+                        return std::pair<iterator,bool>{my_iterator, true};
+                    }
+                    else
+                    {
+                        tmp = tmp->right.get();
+                    }
+                }
 
-        //EMPLACE FORWARDING REFERENCE STD::FORWARD IS NECESSARY
+                else{ //tmp.key == x.key
+                    iterator my_iterator{tmp};
+                    return std::pair<iterator, bool>{my_iterator, false}; 
+                    /** @todo in this case we also have to find the node with the same key, we will calle the function
+                     * FIND inside the else statement
+                    */
 
-        //CLEAR
-
-        //BEGIN FOR THE ITERATOR noexcept because we are not acquiring resources
-        /** @todo retutn the left ost node!!*/
-        iterator begin() noexcept {
-            node* tmp = root_node.get();
-            while(tmp->left){
-                tmp = tmp->left.get();
+                }
             }
-            return iterator{tmp};
+            root_node.reset(new Node{std::forward<P>(x)}); //this time we call  explicit node constructor (l or r ccording to the type passed with forwarding)
+                ++ tree_size;
+                iterator my_iterator{root_node.get()}; 
+                return std::pair<iterator,bool>{my_iterator,true}; //true because we allocate a new node
         }
-        const_iterator begin() const noexcept {const_iterator{root_node.get()};}
-        const_iterator cbegin() const noexcept {return begin();} 
 
-        //END FOR THE ITERATOR noexcept because we are not acquairing resources
-        /** @todo retrun an iteratro to one past the last element*/
-        iterattro end() noexcept {return iterator{nullptr};}
-        const_iterator end() const noexcept { return const_iterator{nullptr};}
-        const_iteratro cend() const noexcept { return end();};
+        //L-value
+        std::pair<iterator,bool> insert (const std::pair<const key_type, val_type>& x){return _insert(x);}
+        //R-Value
+        std::pair<iterator,bool> insert (std::pair<const key_type, val_type>&& x){return _insert(std::move(x));}
 
-        //FIND FOR THE ITERATOR
+        //EMPLACE FORWARDING REFERENCE STD::FORWARD IS NECESSARY_______________________________________________________________________________________
+
+        //CLEAR________________________________________________________________________________________________________________________________________
 
         //BALANCE 
 
@@ -171,12 +176,10 @@ class bst{
         //OSTREAM
         friend
         std::ostream& operator<<(std::ostream& os, const bst& x){
-            auto tmp = x->root_node.get();
             os <<"["<< x.tree_size << "]";
-            while(tmp){
-                os << tmp->data_pair <<" ";
-                /** @todo print the elemnt in order!!!*/
-            }    
+            //for(const auto& elem : x){
+            //    os<< elem.data_pair.first<< "-"<< elem.data_pair.second <<" ";
+            //}
             os <<std::endl;
             return os;
         }
@@ -184,10 +187,10 @@ class bst{
 };
 
 //IMPLEMENTATION OF THE ITERATOR
-template< typename key_type, typenme value_type, typename OP>
+template< typename key_type, typename val_type, typename OP>
 template <typename O>
-class bst<key_type, valuetype, OP>::_Iterator{
-    using node = typename bst<key_type, value_type, OP>::Node;
+class bst<key_type, val_type, OP>::_Iterator{
+    using node = typename bst<key_type, val_type, OP>::Node;
     node* current;
 
 public:
@@ -197,8 +200,8 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::forward_iterator_tag;
 
-    //constructro for the iterator, exlcit because the onstructro can be invoked with one parameter
-    explicit _Iterator(const node*p): current{p} {}
+    //constructro for the iterator, exlcit because the constructro can be invoked with one parameter
+    explicit _Iterator(node*p): current{p} {}
 
     //* and -> operators
     reference operator*() const {return current->pair_data;}
@@ -227,7 +230,7 @@ public:
             }
             current = tmp;
         }
-        return *this
+        return *this;
     }
 
     //post-increment: more computational effort because we need to allocat a new memory
@@ -252,6 +255,24 @@ public:
 };
 
 int main(){
+    int b = 1;
+    int* integerpointer = &b;
+    integerpointer = nullptr;
+
+    if(!integerpointer){
+        std::cout <<"il puntatore è NULL"<<std::endl;
+    }
+    else{
+        std::cout<< "il puntatore punta a:"<< *integerpointer <<std::endl;
+    }
+    
     bst<int,int> tree{};
     tree.insert(std::pair<int,int> (8,1));
+    tree.insert(std::pair<int,int>(9,2));
+    tree.insert(std::pair<int,int> (1,1));
+    tree.insert(std::pair<int,int>(3,2));
+    
+   std::cout << tree <<std::endl;
+   return 0;
+
 }
