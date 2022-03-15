@@ -232,7 +232,17 @@ public:
         return tmp;
     }
 
+    //operator ==
+    friend
+    bool operator==(_Iterator& a, _Iterator& b){
+        return a.current == b.current;
+    }
 
+    //operator !=
+    friend
+    bool operator!=(_Iterator& a, _Iterator& b){
+        return !(a==b); //we call the previous == operatro defined before!!
+    }
 };
 
 int main(){
