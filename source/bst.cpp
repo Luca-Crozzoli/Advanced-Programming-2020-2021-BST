@@ -129,7 +129,7 @@ class bst{
             auto tmp = root_node.get();    
             //if there is a node we have to loop to decide in which point insert the new one
             while(tmp){
-                if(op(x.first, tmp->pair_data.first))//*********if x.key < tmp.key (root) return true
+                if(op(x.first, tmp->pair_data.first))//*********if x.key < tmp.key return true
                 {
                     if (!tmp->left) {//tmp->left == nullptr
                         tmp->left.reset(new Node{std::forward<P>(x), tmp}); //we call the second constructor in which we set the parent pointer (l or r according o the type passed with forwarding)
