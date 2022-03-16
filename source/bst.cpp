@@ -15,9 +15,9 @@ class bst{
 
         Node* parent; //pointer to the parentNode
         
-        //L-VALUE
+        //L-VALUE CNSTRUCTORS FOR THE COPY SEMANTIC
         //constructor for Node when the tree is empty called by insert
-        explicit Node(const std::pair<const key_type,val_type> &x) : pair_data{x}, parent{nullptr} { std::cout << "l-value 1arg\n";} 
+        explicit Node(const std::pair<const key_type,val_type> &x) : pair_data{x}, parent{nullptr} { std::cout << "l-value 1 arg\n";} 
         //constructor called by insert when the tree has already a node
         Node(const std::pair<const key_type,val_type> &x, Node *p) : pair_data{x}, parent{p} { std::cout << "l-value 2 arg\n"; }
 
@@ -31,8 +31,8 @@ class bst{
 
     //COPY FUNCTION CALLED ITERATIVELY TO COPY ALL THE TREE
     void __copy(const std::unique_ptr<Node>& up){
-        if (up){//if unique pointer is not empty (it contains the raw pointer to the root node)
-            insert(up.get()->pair_data);
+        if (up){//if unique pointer is not empty (it contains a raw pointer)
+            insert(up->pair_data);
             __copy(up->left);
             __copy(up->right);
         }
@@ -87,7 +87,8 @@ class bst{
         bst& operator=(bst&&) = default;//move ASSIGNMENT
 
         /*****COPY default is not good because  in this case we want to perfrom a deep copy*/
-        bst(const bst& x){ //copy CONSTRUCTOR
+        bst(const bst& x): tree_size{} { //copy CONSTRUCTOR
+        std::cout<<"COPY CONSTRUCTOR"<<std::endl;
             if (x.tree_size !=0){
                 __copy(x.root_node);
             }else{
@@ -97,6 +98,7 @@ class bst{
         }
 
         bst& operator=(const bst& x){//copy ASSIGNEMENT a standard way
+        std::cout<<"COPY ASSIGNMENT"<<std::endl;
             root_node.reset(); //remember to release the memory we own
 
             auto tmp = x; //copy constructor
@@ -276,7 +278,8 @@ int main(){
     bst<int, int> copy_tree{}; 
     copy_tree = tree;
     
-
+    std::cout<< "Then we print the 2 bst"<<std::endl;
+    std::cout<<" "<<std::endl;
     std::cout <<copy_tree <<std::endl;
     std::cout << tree <<std::endl;
 
