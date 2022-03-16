@@ -304,9 +304,9 @@ int main(){
     
     std::cout<<" "<<std::endl;
     std::cout<<"print all the tree create with the copy constructor and the copy assignment witht he originale one \n"<<std::endl;
-    std::cout<< " tree: \n"<<tree<<std::endl;
+    std::cout<<"tree: \n"<<tree<<std::endl;
     std::cout<<"copy constructor tree: \n" << copy_constructor_tree <<std::endl;
-    std::cout<< "copy assignment tree: \n"<<copy_assignement_tree<<std::endl;
+    std::cout<<"copy assignment tree: \n"<<copy_assignement_tree<<std::endl;
 
 
 
