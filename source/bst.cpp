@@ -125,6 +125,7 @@ class bst{
         //INSERT here we define 2 insert functions calling the function_insert which uses the forwarding:
         //INSERT FORWARDING FUNCTION DECLARED AS PRIVATE AND DEFINED OUTSIDE THE CLASS AFTER THE ITERATOR
         template <typename P> std::pair<iterator,bool> _insert(P &&x){ //forwarding is not a n r-value
+            std::cout<< "forwarding _insert"<<std::endl;
             auto tmp = root_node.get();    
             //if there is a node we have to loop to decide in which point insert the new one
             while(tmp){
@@ -172,11 +173,16 @@ class bst{
         }
 
         //L-value
-        std::pair<iterator,bool> insert (const std::pair<const key_type, val_type>& x){return _insert(x);}
+        std::pair<iterator,bool> insert (const std::pair<const key_type, val_type>& x){ std::cout<<"insert with L"<< std::endl; return _insert(x);}
         //R-Value
-        std::pair<iterator,bool> insert (std::pair<const key_type, val_type>&& x){return _insert(std::move(x));}
+        std::pair<iterator,bool> insert (std::pair<const key_type, val_type>&& x){ std::cout<<"insert with R"<< std::endl; return _insert(std::move(x));}
 
         //EMPLACE FORWARDING REFERENCE STD::FORWARD IS NECESSARY_______________________________________________________________________________________
+        template< class... Types>
+        std::pair<iterator,bool> emplace(Types&&...args){
+            return insert(std::pair<const key_type, val_type>{std::forward<Types>(args)...});
+
+        }
 
         //CLEAR________________________________________________________________________________________________________________________________________
 
@@ -284,11 +290,23 @@ int main(){
     
     bst<int,int> tree{};
     tree.insert(std::pair<int,int> (8,1));
+    std::cout << tree <<std::endl;
     tree.insert(std::pair<int,int>(9,2));
+    std::cout << tree <<std::endl;
     tree.insert(std::pair<int,int> (1,1));
+    std::cout << tree <<std::endl;
     tree.insert(std::pair<int,int>(3,2));
-    
-   std::cout << tree <<std::endl;
+    std::cout << tree <<std::endl;
+
+    std::pair<int, int> my_pair(4,1000); //constucto a pair and then insert it
+    tree.insert(my_pair);
+    std::cout << tree <<std::endl;
+    tree.insert(std::make_pair(12,12000)); //insert a pair directly constructing it
+    std::cout << tree <<std::endl;
+    tree.insert({2,4});
+    std::cout << tree <<std::endl;
+    tree.emplace(100,123456789);
+    std::cout << tree <<std::endl;
 
     /*
     //COPY SEMANTIC TEST
