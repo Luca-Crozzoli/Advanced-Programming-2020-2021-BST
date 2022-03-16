@@ -47,7 +47,7 @@ class bst{
         bst() = default;
         ~bst() noexcept = default; //the default is enough because we don't have raw pointer for the bst class
 
-        //TEMPLATED CLASS FOR THE ITERATOR, I want the iterator to reference the pair data!!_____________________________
+        //TEMPLATED CLASS FOR THE ITERATOR, WE ARE ITERATE OVER THE data_pair!!_____________________________
         template <typename O>
         class _Iterator;
 
@@ -72,13 +72,27 @@ class bst{
         const_iterator cbegin() const noexcept {return begin();} 
 
         //END FOR THE ITERATOR noexcept because we are not acquairing resources_________________________________________________
-        iterator end() noexcept {return iterator{nullptr};}
-        const_iterator end() const noexcept { return const_iterator{nullptr};}
+        iterator end() noexcept {return iterator {nullptr};}
+        const_iterator end() const noexcept { return const_iterator {nullptr};}
         const_iterator cend() const noexcept { return end();};
 
         //FIND FOR THE ITERATOR_________________________________________________________________________________________________
-        iterator find(const key_type& x);
-        const_iterator find(const key_type& x)const;
+        iterator find(const key_type& x) noexcept{
+            for(iterator my_iterator{begin()}; my_iterator != end(); ++my_iterator){
+                if(!op(my_iterator->first,x) && !op(x,my_iterator->first)){
+                    return my_iterator;
+                }
+            }
+            return end();
+        };
+        const_iterator find(const key_type& x) const noexcept {
+            for(const_iterator my_iterator{begin()}; my_iterator != end(); ++my_iterator){
+                if(!op(my_iterator->first,x) && !op(x,my_iterator->first)){
+                    return my_iterator;
+                }
+            }
+            return cend();
+        };
 
         //_______________________________________________________________________________________________________________________
         //COPY AND MOVE SEMANTICS FOR THE BST
@@ -251,8 +265,11 @@ public:
     //operator !=
     friend
     bool operator!=(_Iterator& a, _Iterator& b){
-        return !(a==b); //we call the previous == operatro defined before!!
+        return !(a == b); //we call the previous == operatro defined before!!
     }
+
+    //get the current pointer to the node
+    node* get_current(){return current;}
 };
 
 int main(){
@@ -275,13 +292,23 @@ int main(){
     
    std::cout << tree <<std::endl;
 
-    bst<int, int> copy_tree{}; 
-    copy_tree = tree;
+    //COPY SEMANTIC TEST
+    std::cout<<"test copy semantics"<<std::endl;
+    bst<int,int> copy_constructor_tree{tree};
+    std::cout<<"copy constructor tree: \n" << copy_constructor_tree <<std::endl;
     
-    std::cout<< "Then we print the 2 bst"<<std::endl;
+    bst<int, int> copy_assignement_tree{};
+    copy_assignement_tree = tree;
+    std::cout<< "copy assignment tree: \n"<<copy_assignement_tree<<std::endl;
+    
+    
     std::cout<<" "<<std::endl;
-    std::cout <<copy_tree <<std::endl;
-    std::cout << tree <<std::endl;
+    std::cout<<"print all the tree create with the copy constructor and the copy assignment witht he originale one \n"<<std::endl;
+    std::cout<< " tree: \n"<<tree<<std::endl;
+    std::cout<<"copy constructor tree: \n" << copy_constructor_tree <<std::endl;
+    std::cout<< "copy assignment tree: \n"<<copy_assignement_tree<<std::endl;
+
+
 
    return 0;
 
