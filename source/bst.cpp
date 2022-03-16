@@ -72,9 +72,9 @@ class bst{
         const_iterator cbegin() const noexcept {return begin();} 
 
         //END FOR THE ITERATOR noexcept because we are not acquairing resources_________________________________________________
-        iterator end() noexcept {return iterator {nullptr};}
-        const_iterator end() const noexcept { return const_iterator {nullptr};}
-        const_iterator cend() const noexcept { return end();};
+        iterator end() noexcept {return iterator{nullptr};}
+        const_iterator end() const noexcept { return const_iterator{nullptr};}
+        const_iterator cend() const noexcept { return const_iterator{nullptr};};
 
         //FIND FOR THE ITERATOR_________________________________________________________________________________________________
         iterator find(const key_type& x) noexcept{
@@ -257,14 +257,12 @@ public:
     }
 
     //operator ==
-    friend
-    bool operator==(_Iterator& a, _Iterator& b){
+    friend bool operator==(const _Iterator& a, const _Iterator& b){
         return a.current == b.current;
     }
 
     //operator !=
-    friend
-    bool operator!=(_Iterator& a, _Iterator& b){
+    friend bool operator!=(const _Iterator& a, const _Iterator& b){
         return !(a == b); //we call the previous == operatro defined before!!
     }
 
@@ -329,12 +327,11 @@ int main(){
     std::cout<<"tree: \n"<<tree<<std::endl;*/
 
     //TESTING FIND FUNCTION
-    const int key = 1;
+    /** @todo we need to manage the exception when there is no node thath can be found having thath key!*/
+    int key = 3;
     if((*tree.find(key)).first == key ){
-        std::cout << "there is a node wit the following key:"<<key <<" with value:"<<(*tree.find(key)).second<<std::endl;
+        std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
     }
-
-
 
    return 0;
 
