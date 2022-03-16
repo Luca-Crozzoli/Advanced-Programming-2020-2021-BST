@@ -328,6 +328,12 @@ int main(){
     std::cout<<"move constructor tree: \n" << move_constructor_tree <<std::endl; //REMEBER TO CHANGE THE NAME IF WE WANT TO TST MOVE ASSIGNEMNT
     std::cout<<"tree: \n"<<tree<<std::endl;*/
 
+    //TESTING FIND FUNCTION
+    const int key = 1;
+    if((*tree.find(key)).first == key ){
+        std::cout << "there is a node wit the following key:"<<key <<" with value:"<<(*tree.find(key)).second<<std::endl;
+    }
+
 
 
    return 0;
