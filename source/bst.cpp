@@ -17,22 +17,22 @@ class bst{
         
         //L-VALUE
         //constructor for Node when the tree is empty called by insert
-        explicit Node(const std::pair<const key_type,val_type> &x) : pair_data{x}, parent{nullptr} { std::cout << "l-value\n";} 
+        explicit Node(const std::pair<const key_type,val_type> &x) : pair_data{x}, parent{nullptr} { std::cout << "l-value 1arg\n";} 
         //constructor called by insert when the tree has already a node
-        Node(const std::pair<const key_type,val_type> &x, Node *p) : pair_data{x}, parent{p} { std::cout << "l-value\n"; }
+        Node(const std::pair<const key_type,val_type> &x, Node *p) : pair_data{x}, parent{p} { std::cout << "l-value 2 arg\n"; }
 
         //R-VALUE
         //constructor for Node when the tree is empty called by insert 
-        explicit Node( std::pair<const key_type,val_type>&&x) : pair_data{std::move(x)}, parent(nullptr) { std::cout << "r-value" << std::endl;}
+        explicit Node( std::pair<const key_type,val_type>&&x) : pair_data{std::move(x)}, parent(nullptr) { std::cout << "r-value 1 arg" << std::endl;}
         //constructor called by insert when the tree has already a node
-        Node(std::pair<const key_type,val_type>&&x, Node *p) : pair_data{std::move(x)}, parent{p} {std::cout << "r-value" << std::endl;}
+        Node(std::pair<const key_type,val_type>&&x, Node *p) : pair_data{std::move(x)}, parent{p} {std::cout << "r-value 2 arg" << std::endl;}
 
     };
 
     //COPY FUNCTION CALLED ITERATIVELY TO COPY ALL THE TREE
     void __copy(const std::unique_ptr<Node>& up){
         if (up){//if unique pointer is not empty (it contains the raw pointer to the root node)
-            _insert(up->pair_data);
+            insert(up.get()->pair_data);
             __copy(up->left);
             __copy(up->right);
         }
@@ -55,7 +55,6 @@ class bst{
         using const_iterator = _Iterator<const std::pair<const key_type, val_type> >; // we pass the const templated pair
 
         //BEGIN FOR THE ITERATOR noexcept because we are not acquiring resources_____________________________________________
-        /** @todo retutn the left ost node!!*/
         iterator begin() noexcept {
             Node* tmp = root_node.get();
             while(tmp->left){
@@ -84,15 +83,15 @@ class bst{
         //_______________________________________________________________________________________________________________________
         //COPY AND MOVE SEMANTICS FOR THE BST
         /******MOVE default is good because in bst we do not have raw pointers, it is like having a simple copy*/
-        bst(bst&&) = default;  //move constructor defualt because we don't have raw pointer
-        bst& operator=(bst&&) = default;//move assignment
+        bst(bst&&) = default;  //move CONSTRUCTOR defualt because we don't have raw pointer
+        bst& operator=(bst&&) = default;//move ASSIGNMENT
 
         /*****COPY default is not good because  in this case we want to perfrom a deep copy*/
         bst(const bst& x){ //copy CONSTRUCTOR
             if (x.tree_size !=0){
                 __copy(x.root_node);
             }else{
-                std::cout <<"NO ELEMNTS TO COPY"<<std::endl;
+                std::cout <<"NO ELEMENTS TO COPY"<<std::endl;
             }
 
         }
@@ -100,7 +99,7 @@ class bst{
         bst& operator=(const bst& x){//copy ASSIGNEMENT a standard way
             root_node.reset(); //remember to release the memory we own
 
-            auto tmp = x; //copy consructor
+            auto tmp = x; //copy constructor
             *this = std::move(tmp);// move assignment
             return *this;
 
@@ -173,13 +172,13 @@ class bst{
 
         //EREASE
 
-        //OSTREAM
+        //PUT TO OPERATOR
         friend
         std::ostream& operator<<(std::ostream& os, const bst& x){
-            os <<"["<< x.tree_size << "]";
-            //for(const auto& elem : x){
-            //    os<< elem.data_pair.first<< "-"<< elem.data_pair.second <<" ";
-            //}
+            os <<"BST size :["<< x.tree_size << "]\n";
+            for(auto v : x){
+                os<< "N---->key:"<<v.first<<" value:"<< v.second <<std::endl;
+            }
             os <<std::endl;
             return os;
         }
@@ -273,6 +272,14 @@ int main(){
     tree.insert(std::pair<int,int>(3,2));
     
    std::cout << tree <<std::endl;
+
+    bst<int, int> copy_tree{}; 
+    copy_tree = tree;
+    
+
+    std::cout <<copy_tree <<std::endl;
+    std::cout << tree <<std::endl;
+
    return 0;
 
 }
