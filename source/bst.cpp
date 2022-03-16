@@ -327,7 +327,9 @@ int main(){
     std::cout<<"tree: \n"<<tree<<std::endl;*/
 
     //TESTING FIND FUNCTION
-    /** @todo we need to manage the exception when there is no node thath can be found having thath key!*/
+    /** @todo we need to manage the exception when there is no node thath can be found having thath key!
+     * @exception Segmentation fault segmentation fault if we can not find the key in the tree!!
+    */
     int key = 3;
     if((*tree.find(key)).first == key ){
         std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
