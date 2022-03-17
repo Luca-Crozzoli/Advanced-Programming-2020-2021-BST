@@ -3,6 +3,7 @@
 #include <iterator> // std::forward_iterator_tag;
 #include <memory> //std::unique_pytr
 #include <utility> // std::move
+#include <vector> //std::vector used to create a vector of pair for the balance function
 using namespace std;
 
 template<typename key_type, typename val_type, typename OP = std::less<key_type>>
@@ -49,7 +50,7 @@ class bst{
         bst() = default;
         ~bst() noexcept = default; //the default is enough because we don't have raw pointer for the bst class
 
-        //TEMPLATED CLASS FOR THE ITERATOR, WE ARE ITERATE OVER THE data_pair!!_____________________________
+        //TEMPLATED CLASS FOR THE ITERATOR, WE ARE INTERESTED IN THE data_pair!!_____________________________
         template <typename O>
         class _Iterator;
 
@@ -57,6 +58,7 @@ class bst{
         using const_iterator = _Iterator<const std::pair<const key_type, val_type> >; // we pass the const templated pair
 
         //BEGIN FOR THE ITERATOR noexcept because we are not acquiring resources_____________________________________________
+        //we start from the left most node in the tree which is the first thath has to be readed.
         iterator begin() noexcept {
             Node* tmp = root_node.get();
             while(tmp->left){
@@ -192,9 +194,50 @@ class bst{
             tree_size = 0;
         }
 
-        //BALANCE 
+        //BALANCE______________________________________________________________________________________________________________________________________________________
+        void insert_balance(std::vector<std::pair<const key_type, val_type> >& vec, int sindex, int eindex){
+            if(sindex == eindex){//there is only one lement in the portion of the vector we fall in this when we analize RIGHT PART
+                insert(vec[sindex]);
+                return;
+            }
+            if(sindex > eindex){//we fall in this when we are considering the LEFT PART: WE NEED TIS BCEAUSE THE RESULT OF THE DIVISION IS FLOOR
+                return;
+            }
+            int middle_index = (sindex + eindex)/2;
 
-        //SUBSCRIPTING OPERATOR
+            insert(vec[middle_index]);
+            insert_balance(vec,sindex,middle_index-1); //we balance the LEFT PART from 0 to middel-1
+            insert_balance(vec,middle_index+1,eindex); // we balance the RIGHT PART from middle+1 to size-1
+
+        }
+        
+        void balance(){
+            std::vector<std::pair<const key_type,val_type>> vector_pairs;
+            for(auto elem: *this){ //we are looping trough the object thhat calls the blance function ( a bst tree and with the range for loop we copy the  std::pairs)
+                vector_pairs.push_back(elem);
+            }
+
+            clear(); //we clear the bst tree which calls the function balance.
+
+            //SORTING THE VECTRO IT'S AN ADDITIONAL OPERATION BECAUSE IN THE RANGE FOR LOOP WE USED THE ITERATOR
+            //WHICH (AS WE IMPLEMENTED IT) RETURNS THE VALUE IN ORDER WHILE WE NAVIGATE TROUGH THE TREE
+            /** @todo remeber to delete the sort function because the iteratr is alredy navigate trogh the tree following the key order*/
+            sort(vector_pairs.begin(), vector_pairs.end()); // we sort the vector in ascending order. By defaule sort() in a pair vectro use the first element to order!
+            int vector_pairs_size = vector_pairs.size();
+            insert_balance(vector_pairs, 0 , vector_pairs_size-1);
+            
+        } 
+
+        //SUBSCRIPTING OPERATOR____________________________________________________________________________________________________________________________________________________
+        val_type& operator[](const key_type& x){
+            my_iterator it{find(x)};
+            if(my_iterator->current){
+                return my_iterator->second;
+            }else{
+                insert({x,0});
+            }
+        };
+        val_type& operator[](key_type&& x);
 
         //PUT TO OPERATOR
 
@@ -250,7 +293,7 @@ public:
         //current = last right node -> you reach the end of the tree go back to parents until null pointer
         else{
             node* tmp = current->parent;
-            //curetn = last rigth node -> go back until current = root node and return nullptr
+            //current = last rigth node in respect to the root -> go back until current = root node 
             while(tmp && tmp->right.get() == current){
                 current = tmp; //move to the father
                 tmp = current->parent; //tmp will be the grandhfather
@@ -314,9 +357,18 @@ int main(){
     tree.emplace(100,123456789);
     std::cout << tree <<std::endl;
 
-
-    tree.clear();
+    //TESTING CLEAR COMMAND
+    //tree.clear();
     std::cout<<tree<<std::endl;
+
+    //DIVISION WITH INTEGERS IT RETRUNS THE FLOOR VALUE (AROTONDAMENTO PER DIFETTO)
+    //std::cout<<"Performing an integer division"<<std::endl;
+    //int a = 1;
+    //int d = 2;
+    //std::cout<<"the result of "<<a<<"/"<<d<<" = "<<a/d<<std::endl;
+
+    int value = 0-1;
+    std::cout<<"0-1="<<value<<std::endl;
 
     /*
     //COPY SEMANTIC TEST
