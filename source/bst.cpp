@@ -27,6 +27,8 @@ class bst{
         //constructor called by insert when the tree has already a node
         Node(std::pair<const key_type,val_type>&&x, Node *p) : pair_data{std::move(x)}, parent{p} {std::cout << "r-value 2 arg" << std::endl;}
 
+        ~Node() noexcept {std::cout<<"Node destructor"<<std::endl;}
+
     };
 
     //COPY FUNCTION CALLED ITERATIVELY TO COPY ALL THE TREE
@@ -185,6 +187,10 @@ class bst{
         }
 
         //CLEAR________________________________________________________________________________________________________________________________________
+        void clear(){
+            root_node.reset();//resetting the root node allo th edeletion of all the other nodes because fo smart pointers!
+            tree_size = 0;
+        }
 
         //BALANCE 
 
@@ -307,6 +313,10 @@ int main(){
     std::cout << tree <<std::endl;
     tree.emplace(100,123456789);
     std::cout << tree <<std::endl;
+
+
+    tree.clear();
+    std::cout<<tree<<std::endl;
 
     /*
     //COPY SEMANTIC TEST
