@@ -95,7 +95,7 @@ class bst{
                     return my_iterator;
                 }
             }
-            return cend();
+            return end();
         };
 
         //_______________________________________________________________________________________________________________________
@@ -230,14 +230,25 @@ class bst{
 
         //SUBSCRIPTING OPERATOR____________________________________________________________________________________________________________________________________________________
         val_type& operator[](const key_type& x){
-            my_iterator it{find(x)};
-            if(my_iterator->current){
+            std::cout<<"L-value operator[]"<<std::endl;
+            iterator my_iterator{find(x)};
+            if(my_iterator.get_current()){//if current pointer of the iteratro is different from nullptr there is a node with that key
                 return my_iterator->second;
             }else{
-                insert({x,0});
+                insert({x,{}});//create a new pair and insert a new node with thah pair in the tree (value is default)
+                return find(x)->second;
             }
-        };
-        val_type& operator[](key_type&& x);
+        }
+        val_type& operator[](key_type&& x){
+            std::cout<<"R-value operator[]"<<std::endl;
+            iterator my_iterator{find(x)};
+            if(my_iterator.get_current()){//if current pointer of the iteratro is different from nullptr there is a node with that key
+                return my_iterator->second;
+            }else{
+                insert({x,{}});//create a new pair and insert a new node with thath pair in the tree (value is default)
+                return find(x)->second;
+            }
+        }
 
         //PUT TO OPERATOR
 
@@ -356,6 +367,15 @@ int main(){
     std::cout << tree <<std::endl;
     tree.emplace(100,123456789);
     std::cout << tree <<std::endl;
+
+    //TESTING THE OPERATRO []
+    //int keyop = 5; //we search fro a key which is not present, we simple add a new node with a default value!!
+    //auto value_L= tree[keyop]; //L value
+    //auto value_R = tree[2]; //R value
+
+    //std::cout<<"value_Lop[]:"<<value_L<<"  value_Rop[]:"<<value_R<<std::endl;
+
+
 
     //TESTING CLEAR COMMAND
     //tree.clear();
