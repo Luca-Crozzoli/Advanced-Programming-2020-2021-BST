@@ -286,12 +286,30 @@ class bst{
             if(remove == nullptr){
                 return;
             }
-            auto transplant_tree = [this,remove](Node* first_root, Node* transplant){ //lambda function!! [this,remove] variable included in the scpe of the function
-               Node* parent = first_root->parent; 
 
-               if(parent == nullptr){
+            enum class root_subtree_type {subtree_root, subtree_root_left, subtree_root_right};
+            //LAMBDA FUNCTION, WE EXPLOIT THE CLOSURE CONCEPT, THE CAPTURED VARABLES BECOME PARTS OF THE LAMBDA 
+            auto get_root_subtree_type = [this](Node* root_subtree){
+
+                Node* parent = root_subtree->parent;
+
+                if(parent == nullptr){
+                    return root_subtree_type::subtree_root;
+                }else if(root_subtree == parent->left.get()){
+                    return root_subtree_type::subtree_root_left;
+                }else{
+                    return root_subtree_type::subtree_root_right;
+                }
+
+            } ;
+
+            //LAMBDA FUNCTION, WE EXPLOIT THE CLOSURE CONCEPT, THE CAPTURED VARIABLE BECOME PARTS OF THE LAMBDA
+            auto transplant_tree = [this](Node* root_transplant, root_subtree_type rst, Node* transplant){ //lambda function!! [this,remove] variable included in the scpe of the function
+               Node* parent = root_transplant->parent; 
+
+               if(rst == root_subtree_type::subtree_root){
                    root_node.reset(transplant);
-               }else if(remove == parent->left.get()){/**!!____WARNING___!!non ho più la ownership MI RITORNA UN NULLPTR!!*/
+               }else if(rst == root_subtree_type::subtree_root_left){/**else if(remove == parent->left.get())!!____WARNING___!!non ho più la ownership MI RITORNA UN NULLPTR!!*/
                    parent->left.reset(transplant);
                }else{
                    parent->right.reset(transplant);
@@ -303,23 +321,29 @@ class bst{
             };
 
             if(remove->left.get() == nullptr){//Node remove have only rigth child
-                transplant_tree(remove,remove->right.release());
+                transplant_tree(remove, get_root_subtree_type(remove),remove->right.release());
             }else if(remove->right.get() == nullptr){//node remove have only left child
-                transplant_tree(remove,remove->left.release());
+                transplant_tree(remove,get_root_subtree_type(remove),remove->left.release());
             }
             else{//Node remove have both left and right child
                     Node* left_most = get_left_most(remove->right.get());
+                    //To slve the !!___WARNIING___!! inside the transplat tree function we firt nedd to know
+                    //the type of the node before it will be relased to fall in the corret if statement in the transplant
+                    //function.
+                    //IF WE DON'T DO THAHT BEFORE THE RELASE WE ENCOUNTER THE WARNING BECAUSE WE ARE ACESSING A NODE
+                    //WITH GET ALREADY REALS AND IT WILL RETURN A NULLPTR
+                    auto left_most_rst = get_root_subtree_type(left_most);
                     release_node(left_most); //we release the node to avoid the dleetion of the full tree
 
                     if(left_most->parent != remove){
-                        transplant_tree(left_most, left_most->right.release());
+                        transplant_tree(left_most,left_most_rst, left_most->right.release());
                         left_most->right.reset(remove->right.release());
                         left_most->right.get()->parent = left_most;
                     }
                     
                     Node* left_child_of_remove = remove->left.release();
                     
-                    transplant_tree(remove, left_most);
+                    transplant_tree(remove,get_root_subtree_type(remove),left_most);
                     left_most->left.reset(left_child_of_remove);
                     left_most->left.get()->parent=left_most;
             }
