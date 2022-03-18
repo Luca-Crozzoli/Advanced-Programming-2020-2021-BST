@@ -15,6 +15,10 @@ class bst{
         std::unique_ptr<Node> right;
 
         Node* parent; //pointer to the parentNode
+
+        Node* get_parent() const noexcept{return parent;}
+        Node* get_left() const noexcept{return left.get();}
+        Node* get_right() const noexcept{return right.get();}
         
         //L-VALUE CNSTRUCTORS FOR THE COPY SEMANTIC
         //constructor for Node when the tree is empty called by insert
@@ -131,7 +135,7 @@ class bst{
         template <typename P> std::pair<iterator,bool> _insert(P &&x){ //forwarding is not a n r-value
             std::cout<< "forwarding _insert"<<std::endl;
             auto tmp = root_node.get();    
-            //if there is a node we have to loop to decide in which point insert the new one
+            //if there is a node in the tree we have to loop to decide in which point insert the new one
             while(tmp){
                 if(op(x.first, tmp->pair_data.first))//*********if x.key < tmp.key return true
                 {
@@ -170,6 +174,7 @@ class bst{
 
                 }
             }
+            //we insert the first node because the tree is empty
             root_node.reset(new Node{std::forward<P>(x)}); //this time we call  explicit node constructor (l or r ccording to the type passed with forwarding)
                 ++ tree_size;
                 iterator my_iterator{root_node.get()}; 
@@ -250,11 +255,81 @@ class bst{
             }
         }
 
-        //PUT TO OPERATOR
 
-        //EREASE
+        //ADDITIONAL FUNCTION USED TO REALSE THE NODE, WE ALSO RELASE THE POINTER OF THE PARENT
+        Node* release_node(const Node* node_to_release){
+            if(node_to_release->parent == nullptr){ //if the node is a root node we relase the root
+                return root_node.release();
+            }
 
-        //PUT TO OPERATOR
+            if(node_to_release->parent->left.get() == node_to_release){ //if the node is a left child we releeas the parent left pointer
+                return node_to_release->parent->left.release();
+            }
+
+            return node_to_release->parent->right.release();//otherwise the node is a right child, we relase the right pointer of the parent
+        }
+
+
+        Node* get_left_most(Node* node)noexcept{
+            while(node && node->left.get()){
+                node = node->left.get();
+            }
+            return node;
+        }
+
+        //EREASE_________________________________________________________________________________________________________________________
+        void erase(const key_type& x){
+
+            iterator my_iterator{find(x)};
+            Node* remove = my_iterator.get_current(); // we obtain a raw pointer to the current node in which we are with the iterator
+            
+            if(remove == nullptr){
+                return;
+            }
+            auto transplant_tree = [this,remove](Node* first_root, Node* transplant){
+               Node* parent = first_root->parent; 
+
+               if(parent == nullptr){
+                   root_node.reset(transplant);
+               }else if(remove == parent->left.get()){
+                   parent->left.reset(transplant);
+               }else{
+                   parent->right.reset(transplant);
+               }
+
+               if(transplant){
+                   transplant->parent = parent;
+               }
+            };
+
+            if(remove->left.get() == nullptr){//Node remove have only rigth child
+                transplant_tree(remove,remove->right.release());
+            }else if(remove->right.get() == nullptr){//node remove have only left child
+                transplant_tree(remove,remove->left.release());
+            }
+            else{//Node remove have both left and right child
+                    Node* left_most = get_left_most(remove->right.get());
+                    release_node(left_most); //we release the node to avoid the dleetion of the full tree
+
+                    if(left_most->parent != remove){
+                        transplant_tree(left_most, left_most->right.release());
+                        left_most->right.reset(remove->right.release());
+                        left_most->right.get()->parent = left_most;
+                    }
+                    
+                    Node* left_child_of_remove = remove->left.release();
+                    
+                    transplant_tree(remove, left_most);
+                    left_most->left.reset(left_child_of_remove);
+                    left_most->left.get()->parent=left_most;
+            }
+
+            --tree_size;
+            
+            
+        }
+
+        //PUT TO OPERATOR________________________________________________________________________________________________________________
         friend
         std::ostream& operator<<(std::ostream& os, const bst& x){
             os <<"BST size :["<< x.tree_size << "]\n";
@@ -288,12 +363,12 @@ public:
     reference operator*() const {return current->pair_data;}
     pointer operator->() const {return &**this;}
 
-    //pre-increment accordin to the navigation fo the tree from left to right
+    //pre-increment according to the navigation of the tree from left to right
     _Iterator& operator++(){
         if(!current){  //current == nullptr
             return *this;
         }
-        //Go right and find the left most node if thera are left node
+        //If te current node has a right substree then the next node is the left most to the right subtree
         else if (current->right){ //if the current node has a right child i have to go to teh left most node from the roght child
             current = current->right.get(); //retrun the raw pointer to the right child fo current
             while(current->left){// until there are left child move always on the left
@@ -302,12 +377,12 @@ public:
         }
         //current = last left node -> retrun the parent
         //current = last right node -> you reach the end of the tree go back to parents until null pointer
-        else{
+        else{//If the current node doesn't have right subtree the next node is the first ancestor of current which left sono is also an ancestor of current
             node* tmp = current->parent;
             //current = last rigth node in respect to the root -> go back until current = root node 
             while(tmp && tmp->right.get() == current){
                 current = tmp; //move to the father
-                tmp = current->parent; //tmp will be the grandhfather
+                tmp = tmp->parent; //tmp will be the grandhfather
             }
             current = tmp;
         }
@@ -349,24 +424,20 @@ int main(){
     }
     
     bst<int,int> tree{};
-    tree.insert(std::pair<int,int> (8,1));
+    tree.insert(std::pair<int,int> (3,1));
     std::cout << tree <<std::endl;
-    tree.insert(std::pair<int,int>(9,2));
+    tree.insert(std::pair<int,int>(2,2));
     std::cout << tree <<std::endl;
-    tree.insert(std::pair<int,int> (1,1));
+    tree.insert(std::pair<int,int> (5,1));
     std::cout << tree <<std::endl;
-    tree.insert(std::pair<int,int>(3,2));
+    //tree.insert(std::pair<int,int>(3,2));
+    //std::cout << tree <<std::endl;
+
+    tree.erase(3);
+
     std::cout << tree <<std::endl;
 
-    std::pair<int, int> my_pair(4,1000); //constucto a pair and then insert it
-    tree.insert(my_pair);
-    std::cout << tree <<std::endl;
-    tree.insert(std::make_pair(12,12000)); //insert a pair directly constructing it
-    std::cout << tree <<std::endl;
-    tree.insert({2,4});
-    std::cout << tree <<std::endl;
-    tree.emplace(100,123456789);
-    std::cout << tree <<std::endl;
+    
 
     //TESTING THE OPERATRO []
     //int keyop = 5; //we search fro a key which is not present, we simple add a new node with a default value!!
@@ -430,10 +501,10 @@ int main(){
     /** @todo we need to manage the exception when there is no node thath can be found having thath key!
      * @exception Segmentation fault segmentation fault if we can not find the key in the tree!!
     */
-    int key = 3;
-    if((*tree.find(key)).first == key ){
-        std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
-    }
+    //int key = 3;
+    //if((*tree.find(key)).first == key ){
+    //    std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
+    //}
 
    return 0;
 
