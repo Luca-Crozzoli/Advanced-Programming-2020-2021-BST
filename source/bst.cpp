@@ -256,7 +256,7 @@ class bst{
         }
 
 
-        //ADDITIONAL FUNCTION USED TO REALSE THE NODE, WE ALSO RELASE THE POINTER OF THE PARENT
+        //ADDITIONAL FUNCTION USED TO REALSE THE NODE, we reales the node from itìs parent
         Node* release_node(const Node* node_to_release){
             if(node_to_release->parent == nullptr){ //if the node is a root node we relase the root
                 return root_node.release();
@@ -286,12 +286,12 @@ class bst{
             if(remove == nullptr){
                 return;
             }
-            auto transplant_tree = [this,remove](Node* first_root, Node* transplant){
+            auto transplant_tree = [this,remove](Node* first_root, Node* transplant){ //lambda function!! [this,remove] variable included in the scpe of the function
                Node* parent = first_root->parent; 
 
                if(parent == nullptr){
                    root_node.reset(transplant);
-               }else if(remove == parent->left.get()){
+               }else if(remove == parent->left.get()){/**!!____WARNING___!!non ho più la ownership MI RITORNA UN NULLPTR!!*/
                    parent->left.reset(transplant);
                }else{
                    parent->right.reset(transplant);
@@ -424,16 +424,18 @@ int main(){
     }
     
     bst<int,int> tree{};
-    tree.insert(std::pair<int,int> (3,1));
+    tree.insert(std::pair<int,int> (6,1));
     std::cout << tree <<std::endl;
-    tree.insert(std::pair<int,int>(2,2));
+    tree.insert(std::pair<int,int>(1,2));
     std::cout << tree <<std::endl;
-    tree.insert(std::pair<int,int> (5,1));
+    tree.insert(std::pair<int,int> (15,1));
     std::cout << tree <<std::endl;
-    //tree.insert(std::pair<int,int>(3,2));
-    //std::cout << tree <<std::endl;
+    tree.insert(std::pair<int,int>(12,2));
+    std::cout << tree <<std::endl;
+    tree.insert(std::pair<int,int>(13,2));
+    std::cout << tree <<std::endl;
 
-    tree.erase(3);
+    tree.erase(6);
 
     std::cout << tree <<std::endl;
 
@@ -450,7 +452,7 @@ int main(){
 
     //TESTING CLEAR COMMAND
     //tree.clear();
-    std::cout<<tree<<std::endl;
+    //std::cout<<tree<<std::endl;
 
     //DIVISION WITH INTEGERS IT RETRUNS THE FLOOR VALUE (AROTONDAMENTO PER DIFETTO)
     //std::cout<<"Performing an integer division"<<std::endl;
@@ -458,8 +460,8 @@ int main(){
     //int d = 2;
     //std::cout<<"the result of "<<a<<"/"<<d<<" = "<<a/d<<std::endl;
 
-    int value = 0-1;
-    std::cout<<"0-1="<<value<<std::endl;
+    //int value = 0-1;
+    //std::cout<<"0-1="<<value<<std::endl;
 
     /*
     //COPY SEMANTIC TEST
