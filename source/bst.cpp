@@ -137,8 +137,7 @@ class bst{
         template <typename P> std::pair<iterator,bool> _insert(P &&x){ //forwarding is not a n r-value
             std::cout<< "forwarding _insert"<<std::endl;
             auto tmp = root_node.get();    
-            //if there is a node in the tree we have to loop to decide in which point insert the new one
-            while(tmp){
+            while(tmp){//if there is a node in the tree we have to loop to decide in which point insert the new one
                 if(op(x.first, tmp->pair_data.first))//if x.key < tmp.key return true
                 {
                     if (!tmp->left) {//tmp->left == nullptr
@@ -165,9 +164,7 @@ class bst{
                     {
                         tmp = tmp->right.get();
                     }
-                }
-
-                else{ //tmp.key == x.key
+                }else{ //tmp.key == x.key
                     iterator my_iterator = find(x.first);
                     return std::pair<iterator, bool>{my_iterator, false}; 
                 }
