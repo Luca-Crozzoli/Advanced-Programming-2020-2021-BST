@@ -140,7 +140,7 @@ class bst{
             while(tmp){//if there is a node in the tree we have to loop to decide in which point insert the new one
                 if(op(x.first, tmp->pair_data.first))//if x.key < tmp.key return true
                 {
-                    if (!tmp->left) {//tmp->left == nullptr
+                    if (!tmp->left) {// if tmp->left == nullptr
                         tmp->left.reset(new Node{std::forward<P>(x), tmp}); //we call the second constructor in which we set the parent pointer (l or r according o the type passed with forwarding)
                         ++ tree_size;
                         iterator my_iterator{tmp->left.get()};
@@ -153,7 +153,7 @@ class bst{
                 }
                 else if(op(tmp->pair_data.first, x.first))//if x-key > tmp.key
                 {
-                    if (!tmp->right)// tmp-> right == nullptr
+                    if (!tmp->right)// if tmp-> right == nullptr
                     {
                         tmp->right.reset(new Node{std::forward<P>(x), tmp});//we call the second constructor in which we set the parent pointer (l or r according o the type passed with forwarding)
                         ++ tree_size;
