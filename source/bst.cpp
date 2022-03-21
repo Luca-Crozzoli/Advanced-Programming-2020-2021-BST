@@ -259,14 +259,14 @@ class bst{
                 return root_node.release();
             }
 
-            if(node_to_release->parent->left.get() == node_to_release){ //if the node is a left child we releeas the parent left pointer
+            if(node_to_release->parent->left.get() == node_to_release){ //if the node is a left child we release the parent left pointer
                 return node_to_release->parent->left.release();
             }
 
             return node_to_release->parent->right.release();//otherwise the node is a right child, we relase the right pointer of the parent
         }
 
-
+        //ADDITIONAL FUNCTIONUSED TO FIND THE LEFT MOST NODE STRATING FORM A ROOT SUBTREE NODE
         Node* get_left_most(Node* node) noexcept{
             while(node && node->left.get()){
                 node = node->left.get();
@@ -274,7 +274,7 @@ class bst{
             return node;
         }
 
-        //EREASE_________________________________________________________________________________________________________________________
+        //ERASE_________________________________________________________________________________________________________________________
         void erase(const key_type& x){
             
             iterator my_iterator{find(x)};
@@ -330,13 +330,13 @@ class bst{
             }
             else{//Node remove have both left and right child
                     Node* left_most = get_left_most(remove->right.get());
-                    //To slve the !!___WARNIING___!! inside the transplat tree function we firt nedd to know
+                    //To solve the !!___WARNIING___!! inside the transplat tree function we first nedd to know
                     //the type of the node before it will be relased to fall in the corret if statement in the transplant
                     //function.
                     //IF WE DON'T DO THAHT BEFORE THE RELASE WE ENCOUNTER THE WARNING BECAUSE WE ARE ACESSING A NODE
-                    //WITH GET ALREADY REALS AND IT WILL RETURN A NULLPTR
+                    //WITH GET WHEN WE CALL TRANSPLANT_TREE IN LINE 342 (GET RETRUN NULL BECAUSE THE POINTER WAS PREVIOUSLY RELASED!!)
                     auto left_most_rst = get_root_subtree_type(left_most);
-                    release_node(left_most); //we release the node to avoid the dleetion of the full tree
+                    release_node(left_most); //we release the node to avoid the deletion fo the full tree because of unique pointers
 
                     if(left_most->parent != remove){
                         transplant_tree(left_most,left_most_rst, left_most->right.release());
@@ -344,7 +344,8 @@ class bst{
                         left_most->right.get()->parent = left_most;
                     }
                     
-                    Node* left_child_of_remove = remove->left.release();
+                    Node* left_child_of_remove = remove->left.release();// we save the left_child_to_be remvode because when we call trnsplant_tree the remove node is delted and
+                                                                        //we can not acess anymore the left child of remove by using remove.
                     
                     transplant_tree(remove,get_root_subtree_type(remove),left_most);
                     left_most->left.reset(left_child_of_remove);

@@ -19,22 +19,6 @@
  *
  * AP_ASSERT(condition) << "optional additional message" << std::endl;
  *
- * AP_ASSERT_IN_RANGE(element,min,max); // check if element belongs to
- * [min,max]
- *
- * AP_ASSERT_EQ(a,b); // check if a == b, do not use with floating point
- * numbers
- *
- * AP_ASSERT_LT(a,b); // check if a < b
- *
- * AP_ASSERT_LE(a,b); // check if a <= b
- *
- * AP_ASSERT_GT(a,b); // check if a > b
- *
- * AP_ASSERT_GE(a,b); // check if a >= b
- *
- * All the above, by default, throw std::runtime_error.
- *
  * If you whant to throw your own exception type you can use the macro
  * AP_ASSERT as follows
  *
@@ -197,59 +181,5 @@ namespace internal {
   _AP_ASSERT_(cond, extype) << "  condition: " << #cond << " is not true\n\n"
 
 #define _AP_ASSERT1(cond) _AP_ASSERT2(cond, std::runtime_error)
-
-#define AP_ASSERT_IN_RANGE(position, lower_bound, upper_bound)                 \
-  _AP_ASSERT((position >= lower_bound) && (position <= upper_bound))           \
-      << "Out of range: " << position << " is not in range [" << lower_bound   \
-      << ", " << upper_bound << "]\n\n"
-
-#define AP_ASSERT_EQ(a, b)                                                     \
-  _AP_ASSERT((a == b)) << a << " was expected to be equal to " << b << std::endl
-
-#define AP_ASSERT_NE(a, b)                                                     \
-  _AP_ASSERT((a != b)) << a << " was expected to be not equal to " << b        \
-                       << std::endl
-
-#define AP_ASSERT_LT(a, b)                                                     \
-  _AP_ASSERT((a < b)) << a << " was expected to be less than " << b << std::endl
-
-#define AP_ASSERT_LE(a, b)                                                     \
-  _AP_ASSERT((a <= b)) << a << " was expected to be less or equal than " << b  \
-                       << std::endl
-
-#define AP_ASSERT_GT(a, b)                                                     \
-  _AP_ASSERT((a > b)) << a << " was expected to be greater than " << b         \
-                      << std::endl
-
-#define AP_ASSERT_GE(a, b)                                                     \
-  _AP_ASSERT((a >= b)) << a << " was expected to be greater or equal than "    \
-                       << b << std::endl
-
-#define AP_ERROR_IN_RANGE(position, lower_bound, upper_bound)                  \
-  AP_ERROR((position >= lower_bound) && (position <= upper_bound))             \
-      << "Out of range: " << position << " is not in range [" << lower_bound   \
-      << ", " << upper_bound << "]\n\n"
-
-#define AP_ERROR_EQ(a, b)                                                      \
-  AP_ERROR((a == b)) << a << " was expected to be equal to " << b << std::endl
-
-#define AP_ERROR_NE(a, b)                                                      \
-  AP_ERROR((a != b)) << a << " was expected to be not equal to " << b          \
-                     << std::endl
-
-#define AP_ERROR_LT(a, b)                                                      \
-  AP_ERROR((a < b)) << a << " was expected to be less than " << b << std::endl
-
-#define AP_ERROR_LE(a, b)                                                      \
-  AP_ERROR((a <= b)) << a << " was expected to be less or equal than " << b    \
-                     << std::endl
-
-#define AP_ERROR_GT(a, b)                                                      \
-  AP_ERROR((a > b)) << a << " was expected to be greater than " << b           \
-                    << std::endl
-
-#define AP_ERROR_GE(a, b)                                                      \
-  AP_ERROR((a >= b)) << a << " was expected to be greater or equal than " << b \
-                     << std::endl
 
 #endif  // __AP_ERROR_H__
