@@ -144,7 +144,7 @@ class bst{
                         tmp->left.reset(new Node{std::forward<P>(x), tmp}); //we call the second constructor in which we set the parent pointer (l or r according o the type passed with forwarding)
                         ++ tree_size;
                         iterator my_iterator{tmp->left.get()};
-                        return std::pair<iterator, bool>{my_iterator, true}; //true because we allocate a new node
+                        return std::pair<iterator, bool>{my_iterator, true}; //true because we insert a new node
                     }
                     else
                     {
@@ -158,7 +158,7 @@ class bst{
                         tmp->right.reset(new Node{std::forward<P>(x), tmp});//we call the second constructor in which we set the parent pointer (l or r according o the type passed with forwarding)
                         ++ tree_size;
                         iterator my_iterator{tmp->right.get()};
-                        return std::pair<iterator,bool>{my_iterator, true};
+                        return std::pair<iterator,bool>{my_iterator, true}; //true becasue we insert a new node
                     }
                     else
                     {
