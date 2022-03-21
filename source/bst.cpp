@@ -7,39 +7,60 @@
 #include "ap_error.h"
 using namespace std;
 
+/** definition of the templated class bst with inside the struct Node
+ * @tparam key_type the type of the key to identify each single node 
+ * @tparam val_type the type of the value stored in each node
+ * @tparam OP the operator used to compare the keys of the nodes (default std::less)
+ **/
 template<typename key_type, typename val_type, typename OP = std::less<key_type>>
 class bst{
-
+    /** Struct Node
+     * -left and right unique pointers
+     * -raw pointer to its parent node
+     **/
     struct Node{
+        /**pair_data std::pair<key_type,val_type> */
         std::pair<const key_type, val_type> pair_data;
+        /**left unique pointer to the left child*/
         std::unique_ptr<Node> left;
+        /**rigth unique pointer to the right child*/
         std::unique_ptr<Node> right;
+        /**parent raw pointer to the parent's node*/
+        Node* parent; 
 
-        Node* parent; //pointer to the parentNode
-
+        /** function that retruns the raw pointer to the parent's node
+         * @return Node* pointing the parent*/
         Node* get_parent() const noexcept{return parent;}
+        /** function that return teh raw pointer to the left child
+         * of the current node @return Node* pointing left child*/ 
         Node* get_left() const noexcept{return left.get();}
+        /** function that return teh raw pointer to the right child
+         * of the current node @return Node* pointing right child*/ 
         Node* get_right() const noexcept{return right.get();}
         
-        //L-VALUE CNSTRUCTORS FOR THE COPY SEMANTIC
-        //constructor for Node when the tree is empty called by insert
+        //L-VALUE 
+        /**Constructor for Node called by insert when tree is empty*/
         explicit Node(const std::pair<const key_type,val_type> &x) : pair_data{x}, parent{nullptr} { std::cout << "l-value 1 arg\n";} 
-        //constructor called by insert when the tree has already a node
+        /**Constructor for Node called by insert when tree is no more empty, set in a proper way the parent pointer*/
         Node(const std::pair<const key_type,val_type> &x, Node *p) : pair_data{x}, parent{p} { std::cout << "l-value 2 arg\n"; }
 
         //R-VALUE
-        //constructor for Node when the tree is empty called by insert 
+        /**Constructor for Node called by insert when tree is empty*/
         explicit Node( std::pair<const key_type,val_type>&&x) : pair_data{std::move(x)}, parent(nullptr) { std::cout << "r-value 1 arg" << std::endl;}
-        //constructor called by insert when the tree has already a node
+        /**Constructor for Node called by insert when tree is no more empty, set in a proper way the parent pointer*/
         Node(std::pair<const key_type,val_type>&&x, Node *p) : pair_data{std::move(x)}, parent{p} {std::cout << "r-value 2 arg" << std::endl;}
 
+        /**Destructor of Node*/
         ~Node() noexcept {std::cout<<"Node destructor"<<std::endl;}
 
     };
 
     //COPY FUNCTION CALLED ITERATIVELY TO COPY ALL THE TREE
+    /**copy function called iteratively to perfrom a deep copy of the tree when we 
+     * use the copy constructor
+    */
     void __copy(const std::unique_ptr<Node>& up){
-        if (up){//if unique pointer is not empty (it contains a raw pointer)
+        if (up){//if unique pointer != empty (it contains a raw pointer)
             insert(up->pair_data);
             __copy(up->left);
             __copy(up->right);
@@ -47,15 +68,22 @@ class bst{
     }
 
     public:
+        /** root_node unique pointer pointing to the root of the tree*/
         std::unique_ptr<Node> root_node;
+        /** tree_size kepp track about th size of the tree*/
         std::size_t tree_size;
+        /** op the operator to compare the keys of the nodes*/
         OP op; //Operator
         
         //DEFAULT CONSTRUCTOR AND DESTRUCTOR____________________________________________________________________________
+        /** constructor for bst*/
         bst() = default;
-        ~bst() noexcept = default; //the default is enough because we don't have raw pointer for the bst class
+        /** destructor for bst, default is enough because we don't have raw pointers memebers in bst*/
+        ~bst() noexcept = default; 
 
         //TEMPLATED CLASS FOR THE ITERATOR, WE ARE INTERESTED IN THE data_pair!!_____________________________
+        /** Templated class for the iterator
+         * @tparam O the type we want the iterator to return, we are interested in data_pair*/
         template <typename O>
         class _Iterator;
 
@@ -63,7 +91,8 @@ class bst{
         using const_iterator = _Iterator<const std::pair<const key_type, val_type> >; // we pass the const templated pair
 
         //BEGIN FOR THE ITERATOR noexcept because we are not acquiring resources_____________________________________________
-        //we start from the left most node in the tree which is the first thath has to be readed.
+        /** begin function for the iterator to use in a range for loop, we start iterate from the left mos node
+         * @return an iterator*/
         iterator begin() noexcept {
             Node* tmp = root_node.get();
             while(tmp->left){
@@ -71,6 +100,8 @@ class bst{
             }
             return iterator{tmp};
         }
+        /** begin function for the iterator to use in a range for loop, we start iterate from the left mos node
+         * @return a const iterator*/
         const_iterator begin() const noexcept {
             Node* tmp = root_node.get();
             while(tmp->left){
@@ -78,14 +109,24 @@ class bst{
             }
             return const_iterator{tmp};
         }
+        /** cbegin function for the iterator to us in a range for loop, we start iterate from the left mos node
+         * @return a const iterator*/
         const_iterator cbegin() const noexcept {return begin();} 
 
         //END FOR THE ITERATOR noexcept because we are not acquairing resources_________________________________________________
+        /** end function for the iteratro to use in a range for loop @return an iterator*/
         iterator end() noexcept {return iterator{nullptr};}
+        /**end function for the iteratro to use in a range for loop @return a const iterator*/
         const_iterator end() const noexcept { return const_iterator{nullptr};}
+        /**cend function for the iteratro to use in a range for loop @return an iteratro*/
         const_iterator cend() const noexcept { return const_iterator{nullptr};};
 
         //FIND FOR THE ITERATOR_________________________________________________________________________________________________
+        /** function to find a given key in the tree, if the key is present, retruns an iteratro to the 
+         * proper node, end() otherwise.
+         * @param x the key of the node we want to find
+         * @return an iterator pointing to the proper node
+         * */
         iterator find(const key_type& x) noexcept{
             for(iterator my_iterator{begin()}; my_iterator != end(); ++my_iterator){
                 if(!op(my_iterator->first,x) && !op(x,my_iterator->first)){
@@ -94,6 +135,11 @@ class bst{
             }
             return end();
         };
+        /** function to find a given key in the tree, if the key is present, retruns an oteratro to the 
+         * proper node, end() otherwise.
+         * @param x the key of the node we want to find
+         * @return a const iterator pointing to the proper node
+         * */
         const_iterator find(const key_type& x) const noexcept {
             for(const_iterator my_iterator{begin()}; my_iterator != end(); ++my_iterator){
                 if(!op(my_iterator->first,x) && !op(x,my_iterator->first)){
@@ -105,12 +151,16 @@ class bst{
 
         //_______________________________________________________________________________________________________________________
         //COPY AND MOVE SEMANTICS FOR THE BST
-        /******MOVE default is good because in bst we do not have raw pointers, it is like having a simple copy*/
-        bst(bst&&) noexcept = default;  //move CONSTRUCTOR defualt because we don't have raw pointer
-        bst& operator=(bst&&) noexcept = default;//move ASSIGNMENT
+        //MOVE default is good because in bst we do not have raw pointers, it is like having a simple copy*/
+        /** Move constructor*/
+        bst(bst&&) noexcept = default;  
+        /** Move assignment*/
+        bst& operator=(bst&&) noexcept = default;
 
-        /*****COPY default is not good because  in this case we want to perfrom a deep copy*/
-        bst(const bst& x): tree_size{} { //copy CONSTRUCTOR
+        //COPY default is not good because  in this case we want to perfrom a deep copy*/
+        /** copy constructor, a deep copy si performed
+         * @param x the bst that has to be copied*/
+        bst(const bst& x): tree_size{} {
         std::cout<<"COPY CONSTRUCTOR"<<std::endl;
             try{
                 AP_ERROR(x.root_node)<<"Nothing to copy the tree is empty";
@@ -119,7 +169,7 @@ class bst{
             }
                 __copy(x.root_node);
         }
-
+        /** copy assignment*/
         bst& operator=(const bst& x){//copy ASSIGNEMENT a standard way
         std::cout<<"COPY ASSIGNMENT"<<std::endl;
             root_node.reset(); //remember to release the memory we own
@@ -132,7 +182,10 @@ class bst{
         //________________________________________________________________________________________________________________________
 
         //INSERT here we define 2 insert functions calling the function_insert which uses the forwarding:
-        //INSERT FORWARDING FUNCTION DECLARED AS PRIVATE AND DEFINED OUTSIDE THE CLASS AFTER THE ITERATOR
+        /** Insert function used to insert a new element given the pair of data key and value. This function
+         * uses the forwarding to be called with r and l values according to the template P
+         * @tparam P the type of the pair that can be a const l value or an r value
+         * */
         template <typename P> std::pair<iterator,bool> _insert(P &&x){ //forwarding is not a n r-value
             std::cout<< "forwarding _insert"<<std::endl;
             auto tmp = root_node.get();    
@@ -179,11 +232,29 @@ class bst{
         }
 
         //L-value
+        /** Used to insert a new node given the pair key, value (which are copied). 
+         * the function return a pair of a n iteratro(pointing ot the ndoe)
+         * and a bool. The bool is true f  a new node has been allocated, false otherwise. 
+         * @param x the pair of data thaht must be inserted
+         * @return the iterator pointing to thath node and the flag (true if a new node is inserted)
+         * */
         std::pair<iterator,bool> insert (const std::pair<const key_type, val_type>& x){ std::cout<<"insert with L"<< std::endl; return _insert(x);}
         //R-Value
+        /** Used to insert a new node given the pair key, value (which are moved). 
+         * the function return a pair of a n iteratro(pointing ot the ndoe)
+         * and a bool. The bool is true f  a new node has been allocated, false otherwise. 
+         * @param x the pair of data thaht must be inserted
+         * @return the iterator pointing to thath node and the flag (true if a new node is inserted)
+         * */
         std::pair<iterator,bool> insert (std::pair<const key_type, val_type>&& x){ std::cout<<"insert with R"<< std::endl; return _insert(std::move(x));}
 
         //EMPLACE FORWARDING REFERENCE STD::FORWARD IS NECESSARY HERE IS VARIADIC FUNCTION TEMPLATE_______________________________________________________________________________________
+        /** Inserts a new element into the container constructed in-place with
+        * the given args if there is no element with the key in the container.
+        * @tparam Types The types for the parameters.
+        * @param args The pack corresponding to key and value to insert.
+        * @returns The pair of the iterator and the boolean flag (true if the node is inserted).
+        * */
         template< class... Types>
         std::pair<iterator,bool> emplace(Types&&...args){
             return insert(std::pair<const key_type, val_type>{std::forward<Types>(args)...});
@@ -191,18 +262,31 @@ class bst{
         }
 
         //CLEAR________________________________________________________________________________________________________________________________________
+        /** clear the content of the tree*/
         void clear(){
-            root_node.reset();//resetting the root node allo th edeletion of all the other nodes because fo smart pointers!
+            root_node.reset();//we just delete root_node becuase due to unique pointers all the nodes in the tree will be deleted
             tree_size = 0;
         }
 
         //BALANCE______________________________________________________________________________________________________________________________________________________
+        /** Recursive function for balancing the tree.
+         * Given a sorted vector (in ascending order respect to key) of node's pair (key value),
+         * this function takes the median (rounded down) element of the vector
+         * and inserts the corresponding element in the tree.
+         * Then, this function recursively calls itself twice:
+         * one time with the left part of the vector starting at its first element up to
+         * the one previous the median (corresponding to the inserting element),
+         * another time with the right part of the vector (median excluded).
+         * @param vec the vectro containing the pairs of the node in ascending order respect to the key.
+         * @param sindex start index for the vectro.
+         * @param eindex end index for the vector.
+         * */
         void insert_balance(std::vector<std::pair<const key_type, val_type> >& vec, int sindex, int eindex){
-            if(sindex == eindex){//there is only one lement in the portion of the vector we fall in this when we analize RIGHT PART
+            if(sindex == eindex){//there is only one element in the portion of the vector we fall in this when we analyze RIGHT PART
                 insert(vec[sindex]);
                 return;
             }
-            if(sindex > eindex){//we fall in this when we are considering the LEFT PART: WE NEED TIS BCEAUSE THE RESULT OF THE DIVISION IS FLOOR
+            if(sindex > eindex){//we fall in this when we are considering the LEFT PART: WE NEED THIS BCEAUSE THE RESULT OF THE DIVISION IS FLOOR
                 return;
             }
             int middle_index = (sindex + eindex)/2;
@@ -213,24 +297,28 @@ class bst{
 
         }
         
+        /**balance the tree recursively.
+        */
         void balance(){
             std::vector<std::pair<const key_type,val_type>> vector_pairs;
-            for(auto elem: *this){ //we are looping trough the object thhat calls the blance function ( a bst tree and with the range for loop we copy the  std::pairs)
+            for(auto elem: *this){ //we are looping trough the object that calls the balance function ( a bst tree and with the range for loop we copy the  std::pairs)
                 vector_pairs.push_back(elem);
             }
 
-            clear(); //we clear the bst tree which calls the function balance.
+            clear(); //we clear the bst tree which calls the function balance
 
-            //SORTING THE VECTRO IT'S AN ADDITIONAL OPERATION BECAUSE IN THE RANGE FOR LOOP WE USED THE ITERATOR
-            //WHICH (AS WE IMPLEMENTED IT) RETURNS THE VALUE IN ORDER WHILE WE NAVIGATE TROUGH THE TREE
-            /** @todo remeber to delete the sort function because the iteratr is alredy navigate trogh the tree following the key order*/
-            sort(vector_pairs.begin(), vector_pairs.end()); // we sort the vector in ascending order. By defaule sort() in a pair vectro use the first element to order!
+            //N.B. pairs of each node in the tree are inserted in the vector in order according to the defintion of the operatro++ for the iterator
             int vector_pairs_size = vector_pairs.size();
             insert_balance(vector_pairs, 0 , vector_pairs_size-1);
             
         } 
 
         //SUBSCRIPTING OPERATOR____________________________________________________________________________________________________________________________________________________
+        /** retruns a reference to the value thaht is mapped to a key equivalent to x, perfroming
+         * an insertion if such key does not already exist
+         * @param x the key L value
+         * @return the reference to the value
+         * */
         val_type& operator[](const key_type& x){
             std::cout<<"L-value operator[]"<<std::endl;
             iterator my_iterator{find(x)};
@@ -241,6 +329,11 @@ class bst{
                 return find(x)->second;
             }
         }
+        /** retruns a reference to the value thaht is mapped to a key equivalent to x, perfroming
+         * an insertion if such key does not already exist
+         * @param x the key R value
+         * @return the reference to the value
+         * */
         val_type& operator[](key_type&& x){
             std::cout<<"R-value operator[]"<<std::endl;
             iterator my_iterator{find(x)};
@@ -253,7 +346,12 @@ class bst{
         }
 
 
-        //ADDITIONAL FUNCTION USED TO REALSE THE NODE, we reales the node from itìs parent
+        //ADDITIONAL FUNCTION USED TO REALSE THE NODE, we reales the node from its parent
+        /** function that release the node from it's parent by relase left and right parent's unique pointers
+         * @param node_to_release a raw pointer to the node that has to be released
+         * @return a raw pointer to released node
+         * */
+
         Node* release_node(const Node* node_to_release){
             if(node_to_release->parent == nullptr){ //if the node is a root node we relase the root
                 return root_node.release();
@@ -267,6 +365,10 @@ class bst{
         }
 
         //ADDITIONAL FUNCTIONUSED TO FIND THE LEFT MOST NODE STRATING FORM A ROOT SUBTREE NODE
+        /** function thath retruns the left most node in the tree
+         * @param node a pointer from the node we want to start to find the leftmost node
+         * @return a pointer to the left most node of the subtree with root node
+         * */
         Node* get_left_most(Node* node) noexcept{
             while(node && node->left.get()){
                 node = node->left.get();
@@ -275,6 +377,10 @@ class bst{
         }
 
         //ERASE_________________________________________________________________________________________________________________________
+        /** removes the element (if one exists) with the key equivalent ot key keeping the order
+         * in the tree.
+         * @param x the key of the node to erase
+         * */
         void erase(const key_type& x){
             
             iterator my_iterator{find(x)};
@@ -358,6 +464,12 @@ class bst{
         }
 
         //PUT TO OPERATOR________________________________________________________________________________________________________________
+        /** Overloading of the << operator. This function print the
+         * tree iterating over its nodes.
+         * @param os Reference to output stream.
+         * @param x The tree to be printed.
+         * @returns The reference to the output stream.
+         */
         friend
         std::ostream& operator<<(std::ostream& os, const bst& x){
             try{
@@ -379,10 +491,19 @@ class bst{
 };
 
 //IMPLEMENTATION OF THE ITERATOR
+/**
+ * Class for the iterator of bst.
+ * Accordign to the bst class we have
+ * @tparam key_type the type of the key to identify each single node 
+ * @tparam val_type the type of the value stored in each node
+ * @tparam OP the operator used to compare the keys of the nodes (default std::less)
+ * @tparam O Type of the object pointed by an instance of _Iterator.
+ **/
 template< typename key_type, typename val_type, typename OP>
 template <typename O>
 class bst<key_type, val_type, OP>::_Iterator{
     using node = typename bst<key_type, val_type, OP>::Node;
+    /**current is the node currently pointed by th Iterator*/
     node* current;
 
 public:
@@ -392,14 +513,26 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::forward_iterator_tag;
 
-    //constructro for the iterator, exlcit because the constructro can be invoked with one parameter
+    /** Constructor of an iterator pointing to the given node.
+     * @param p The pointer of the node.
+     * */
     explicit _Iterator(node*p): current{p} {}
 
-    //* and -> operators
+    /** Dereference operator.
+     * @returns The reference to the currently pointed pair_data of the current node.
+     * */
     reference operator*() const {return current->pair_data;}
+
+    /** arrow operator
+     * @returns the pointer to the currently pointed pair_data of the current node.
+     * */
     pointer operator->() const {return &**this;}
 
-    //pre-increment according to the navigation of the tree from left to right
+    /** Pre-increment operator. An increment for the iteratro is equivalenet to
+     * move to the next node in the tree according to the navigation from the one with th lower kry to the one with
+     * th higher key.
+     * @returns The reference to the pre-incremented iterator.
+     */
     _Iterator& operator++(){
         if(!current){  //current == nullptr
             return *this;
@@ -425,20 +558,35 @@ public:
         return *this;
     }
 
-    //post-increment: more computational effort because we need to allocat a new memory
-    //and retrun thath value before the increment operation.
+    /** Post-increment operator.More computational effort
+     * because we allocate new memory to store the old value before we
+     * call the pre increment.
+     * @returns The iterator before being incremented.
+     */
     _Iterator operator++(int){
         auto tmp{*this};
         ++(*this); //call the pre increment on ourselfs
         return tmp;
     }
 
-    //operator ==
+    /** Tests if the iterator object on the left side of ==
+     * is equal to the iterator object on the right side.
+     * @param a The left side iterator object.
+     * @param b The right side iterator object.
+     * @returns True if the iterators are pointing tp the same node; 
+     * false if the iterators are pointing to different nodes.
+     */
     friend bool operator==(const _Iterator& a, const _Iterator& b){
         return a.current == b.current;
     }
 
-    //operator !=
+    /** Tests if the iterator object on the left side of !=
+     * is different to the iterator object on the right side.
+     * @param a The left side iterator object.
+     * @param b The right side iterator object.
+     * @returns True if the iterators are pointing to different nodes ; 
+     * false if the iterators are pointing to the same node .
+     */
     friend bool operator!=(const _Iterator& a, const _Iterator& b){
         return !(a == b); //we call the previous == operatro defined before!!
     }
@@ -475,38 +623,28 @@ int main(){
     tree.insert(std::pair<int,int>(13,2));
     std::cout << tree <<std::endl;
 
-
-    //TESTING ERASE
-    tree.erase(20);
-
     //TESTING EMPLACE
-    //tree.emplace(1,20);
+    //tree.emplace(5,20);
+    //std::cout << tree <<std::endl;
 
-    std::cout << tree <<std::endl;
+    //TESTING CLEAR 
+    //tree.clear();
+    //std::cout<<tree<<std::endl;
+    
+    //TESTING FIND 
+    //int key = 3;
+    //if((*tree.find(key)).first == key ){
+    //   std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
+    //}
 
     
-
-    //TESTING THE OPERATRO []
+    //TESTING THE OPERATOR []
     //int keyop = 5; //we search fro a key which is not present, we simple add a new node with a default value!!
     //auto value_L= tree[keyop]; //L value
     //auto value_R = tree[2]; //R value
 
     //std::cout<<"value_Lop[]:"<<value_L<<"  value_Rop[]:"<<value_R<<std::endl;
 
-
-
-    //TESTING CLEAR COMMAND
-    //tree.clear();
-    //std::cout<<tree<<std::endl;
-
-    //DIVISION WITH INTEGERS IT RETRUNS THE FLOOR VALUE (AROTONDAMENTO PER DIFETTO)
-    //std::cout<<"Performing an integer division"<<std::endl;
-    //int a = 1;
-    //int d = 2;
-    //std::cout<<"the result of "<<a<<"/"<<d<<" = "<<a/d<<std::endl;
-
-    //int value = 0-1;
-    //std::cout<<"0-1="<<value<<std::endl;
 
     /*
     //COPY SEMANTIC TEST
@@ -524,7 +662,8 @@ int main(){
     std::cout<<"print all the tree create with the copy constructor and the copy assignment witht he originale one \n"<<std::endl;
     std::cout<<"tree: \n"<<tree<<std::endl;
     std::cout<<"copy constructor tree: \n" << copy_constructor_tree <<std::endl;
-    std::cout<<"copy assignment tree: \n"<<copy_assignement_tree<<std::endl;*/
+    std::cout<<"copy assignment tree: \n"<<copy_assignement_tree<<std::endl;
+    */
 
     /*
     //MOVE SEMANTIC TEST
@@ -542,16 +681,13 @@ int main(){
     std::cout<<" "<<std::endl;
     std::cout<<"print all the tree create with the move constructor and the move assignment witht he originale one \n"<<std::endl;
     std::cout<<"move constructor tree: \n" << move_constructor_tree <<std::endl; //REMEBER TO CHANGE THE NAME IF WE WANT TO TST MOVE ASSIGNEMNT
-    std::cout<<"tree: \n"<<tree<<std::endl;*/
-
-    //TESTING FIND FUNCTION
-    /** @todo we need to manage the exception when there is no node thath can be found having thath key!
-     * @exception Segmentation fault segmentation fault if we can not find the key in the tree!!
+    std::cout<<"tree: \n"<<tree<<std::endl;
     */
-    //int key = 3;
-    //if((*tree.find(key)).first == key ){
-    //    std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
-    //}
+
+    //TESTING ERASE
+    //tree.erase(20);
+
+    
 
    return 0;
 
