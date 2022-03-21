@@ -116,9 +116,9 @@ class bst{
         //END FOR THE ITERATOR noexcept because we are not acquairing resources_________________________________________________
         /** end function for the iteratro to use in a range for loop @return an iterator*/
         iterator end() noexcept {return iterator{nullptr};}
-        /**end function for the iteratro to use in a range for loop @return a const iterator*/
+        /** end function for the iteratro to use in a range for loop @return a const iterator*/
         const_iterator end() const noexcept { return const_iterator{nullptr};}
-        /**cend function for the iteratro to use in a range for loop @return an iteratro*/
+        /** cend function for the iteratro to use in a range for loop @return an iteratro*/
         const_iterator cend() const noexcept { return const_iterator{nullptr};};
 
         //FIND FOR THE ITERATOR_________________________________________________________________________________________________
@@ -152,7 +152,7 @@ class bst{
         //_______________________________________________________________________________________________________________________
         //COPY AND MOVE SEMANTICS FOR THE BST
         //MOVE default is good because in bst we do not have raw pointers, it is like having a simple copy*/
-        /** Move constructor*/
+        /** Move constructor. Default is good because in bst we are not dealing with raw pointers*/
         bst(bst&&) noexcept = default;  
         /** Move assignment*/
         bst& operator=(bst&&) noexcept = default;
