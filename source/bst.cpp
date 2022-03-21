@@ -4,6 +4,7 @@
 #include <memory> //std::unique_pytr
 #include <utility> // std::move
 #include <vector> //std::vector used to create a vector of pair for the balance function
+#include "ap_error.h"
 using namespace std;
 
 template<typename key_type, typename val_type, typename OP = std::less<key_type>>
@@ -105,8 +106,8 @@ class bst{
         //_______________________________________________________________________________________________________________________
         //COPY AND MOVE SEMANTICS FOR THE BST
         /******MOVE default is good because in bst we do not have raw pointers, it is like having a simple copy*/
-        bst(bst&&) = default;  //move CONSTRUCTOR defualt because we don't have raw pointer
-        bst& operator=(bst&&) = default;//move ASSIGNMENT
+        bst(bst&&) noexcept = default;  //move CONSTRUCTOR defualt because we don't have raw pointer
+        bst& operator=(bst&&) noexcept = default;//move ASSIGNMENT
 
         /*****COPY default is not good because  in this case we want to perfrom a deep copy*/
         bst(const bst& x): tree_size{} { //copy CONSTRUCTOR
@@ -166,12 +167,8 @@ class bst{
                 }
 
                 else{ //tmp.key == x.key
-                    iterator my_iterator{tmp};
+                    iterator my_iterator = find(x.first);
                     return std::pair<iterator, bool>{my_iterator, false}; 
-                    /** @todo in this case we also have to find the node with the same key, we will calle the function
-                     * FIND inside the else statement
-                    */
-
                 }
             }
             //we insert the first node because the tree is empty
@@ -186,7 +183,7 @@ class bst{
         //R-Value
         std::pair<iterator,bool> insert (std::pair<const key_type, val_type>&& x){ std::cout<<"insert with R"<< std::endl; return _insert(std::move(x));}
 
-        //EMPLACE FORWARDING REFERENCE STD::FORWARD IS NECESSARY_______________________________________________________________________________________
+        //EMPLACE FORWARDING REFERENCE STD::FORWARD IS NECESSARY HERE IS VARIADIC FUNCTION TEMPLATE_______________________________________________________________________________________
         template< class... Types>
         std::pair<iterator,bool> emplace(Types&&...args){
             return insert(std::pair<const key_type, val_type>{std::forward<Types>(args)...});
@@ -270,7 +267,7 @@ class bst{
         }
 
 
-        Node* get_left_most(Node* node)noexcept{
+        Node* get_left_most(Node* node) noexcept{
             while(node && node->left.get()){
                 node = node->left.get();
             }
@@ -356,6 +353,14 @@ class bst{
         //PUT TO OPERATOR________________________________________________________________________________________________________________
         friend
         std::ostream& operator<<(std::ostream& os, const bst& x){
+            try{
+                AP_ERROR(x.root_node) << "Nothing to print the tree is empty"<< ".\n";
+            }catch(const std::exception& e){
+                std::cerr << e.what() << std::endl;
+                os << " " << std::endl;
+                return os ;
+            }
+            
             os <<"BST size :["<< x.tree_size << "]\n";
             for(auto v : x){
                 os<< "N---->key:"<<v.first<<" value:"<< v.second <<std::endl;
@@ -448,6 +453,7 @@ int main(){
     }
     
     bst<int,int> tree{};
+    std::cout<<tree<<std::endl;
     tree.insert(std::pair<int,int> (6,1));
     std::cout << tree <<std::endl;
     tree.insert(std::pair<int,int>(1,2));
@@ -459,7 +465,12 @@ int main(){
     tree.insert(std::pair<int,int>(13,2));
     std::cout << tree <<std::endl;
 
-    tree.erase(6);
+
+    //TESTING ERASE
+    //tree.erase(6);
+
+    //TESTING EMPLACE
+    //tree.emplace(1,20);
 
     std::cout << tree <<std::endl;
 
