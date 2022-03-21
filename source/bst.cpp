@@ -276,11 +276,17 @@ class bst{
 
         //EREASE_________________________________________________________________________________________________________________________
         void erase(const key_type& x){
-
+            
             iterator my_iterator{find(x)};
             Node* remove = my_iterator.get_current(); // we obtain a raw pointer to the current node in which we are with the iterator
-            
-            if(remove == nullptr){
+           
+            try{
+                AP_ERROR(remove)<<"Node to erase doesn't exist";
+            }catch(const exception& e){
+                std::cout<<e.what()<<std::endl;
+            }
+
+            if(!remove){
                 return;
             }
 
@@ -470,7 +476,7 @@ int main(){
 
 
     //TESTING ERASE
-    //tree.erase(6);
+    tree.erase(20);
 
     //TESTING EMPLACE
     //tree.emplace(1,20);
