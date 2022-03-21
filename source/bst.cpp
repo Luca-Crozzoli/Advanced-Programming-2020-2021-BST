@@ -291,7 +291,7 @@ class bst{
             }
 
             enum class root_subtree_type {subtree_root, subtree_root_left, subtree_root_right};
-            //LAMBDA FUNCTION, WE EXPLOIT THE CLOSURE CONCEPT, THE CAPTURED VARABLES BECOME PARTS OF THE LAMBDA 
+            //LAMBDA FUNCTION THE CAPTURED VARABLES BECOME PARTS OF THE LAMBDA 
             auto get_root_subtree_type = [this](Node* root_subtree){
 
                 Node* parent = root_subtree->parent;
@@ -306,7 +306,7 @@ class bst{
 
             } ;
 
-            //LAMBDA FUNCTION, WE EXPLOIT THE CLOSURE CONCEPT, THE CAPTURED VARIABLE BECOME PARTS OF THE LAMBDA
+            //LAMBDA FUNCTION THE CAPTURED VARIABLES BECOME PARTS OF THE LAMBDA
             auto transplant_tree = [this](Node* root_transplant, root_subtree_type rst, Node* transplant){ //lambda function!! [this,remove] variable included in the scpe of the function
                Node* parent = root_transplant->parent; 
 
@@ -323,20 +323,20 @@ class bst{
                }
             };
 
-            if(remove->left.get() == nullptr){//Node remove have only rigth child
+            if(remove->left.get() == nullptr){//Node remove have only right child
                 transplant_tree(remove, get_root_subtree_type(remove),remove->right.release());
             }else if(remove->right.get() == nullptr){//node remove have only left child
                 transplant_tree(remove,get_root_subtree_type(remove),remove->left.release());
             }
             else{//Node remove have both left and right child
                     Node* left_most = get_left_most(remove->right.get());
-                    //To solve the !!___WARNIING___!! inside the transplat tree function we first nedd to know
-                    //the type of the node before it will be relased to fall in the corret if statement in the transplant
+                    //To solve the !!___WARNIING___!! inside the transplant tree function we first need to know
+                    //the type of the node before it will be relased, to fall in the corret if statement in the transplant
                     //function.
                     //IF WE DON'T DO THAHT BEFORE THE RELASE WE ENCOUNTER THE WARNING BECAUSE WE ARE ACESSING A NODE
                     //WITH GET WHEN WE CALL TRANSPLANT_TREE IN LINE 342 (GET RETRUN NULL BECAUSE THE POINTER WAS PREVIOUSLY RELASED!!)
                     auto left_most_rst = get_root_subtree_type(left_most);
-                    release_node(left_most); //we release the node to avoid the deletion fo the full tree because of unique pointers
+                    release_node(left_most); 
 
                     if(left_most->parent != remove){
                         transplant_tree(left_most,left_most_rst, left_most->right.release());
@@ -344,7 +344,7 @@ class bst{
                         left_most->right.get()->parent = left_most;
                     }
                     
-                    Node* left_child_of_remove = remove->left.release();// we save the left_child_to_be remvode because when we call trnsplant_tree the remove node is delted and
+                    Node* left_child_of_remove = remove->left.release();// we save the left_child_of_remove  because when we call transplant_tree the remove node is delted and
                                                                         //we can not acess anymore the left child of remove by using remove.
                     
                     transplant_tree(remove,get_root_subtree_type(remove),left_most);
