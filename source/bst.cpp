@@ -112,12 +112,12 @@ class bst{
         /*****COPY default is not good because  in this case we want to perfrom a deep copy*/
         bst(const bst& x): tree_size{} { //copy CONSTRUCTOR
         std::cout<<"COPY CONSTRUCTOR"<<std::endl;
-            if (x.tree_size !=0){
-                __copy(x.root_node);
-            }else{
-                std::cout <<"NO ELEMENTS TO COPY"<<std::endl;
+            try{
+                AP_ERROR(x.root_node)<<"Nothing to copy the tree is empty";
+            }catch(const exception& e){
+                std::cout<< e.what()<< std::endl;
             }
-
+                __copy(x.root_node);
         }
 
         bst& operator=(const bst& x){//copy ASSIGNEMENT a standard way
@@ -453,6 +453,9 @@ int main(){
     }
     
     bst<int,int> tree{};
+
+    bst<int,int> tree2{};
+    tree2 = tree;
     std::cout<<tree<<std::endl;
     tree.insert(std::pair<int,int> (6,1));
     std::cout << tree <<std::endl;
