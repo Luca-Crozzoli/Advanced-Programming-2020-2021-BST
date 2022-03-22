@@ -641,7 +641,6 @@ int main()
     // TESTING ERASE
     // tree.erase(20);
 
-    std::cout<<"end of bst"<<std::endl;
 
     return 0;
 }
