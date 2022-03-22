@@ -573,8 +573,8 @@ int main()
 
     bst<int, int> tree{};
 
-    //bst<int, int> tree2{};
-    //tree2 = tree;
+    bst<int, int> tree2{};
+    tree2 = tree;
     std::cout << tree << std::endl;
     tree.insert(std::pair<int, int>(6, 1));
     std::cout << tree << std::endl;
@@ -596,7 +596,7 @@ int main()
     // std::cout<<tree<<std::endl;
 
     // TESTING FIND
-    // int key = 3;
+    //int key = 15;
     // if((*tree.find(key)).first == key ){
     //    std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
     // }
@@ -610,41 +610,33 @@ int main()
 
     /*
     //COPY SEMANTIC TEST
-    //COPY CONSTRUCTO
-    std::cout<<"test copy semantics"<<std::endl;
+    //COPY CONSTRUCTOR
+    std::cout<<"TEST copy semantic usign tree"<<std::endl;
     bst<int,int> copy_constructor_tree{tree};
-    std::cout<<"copy constructor tree: \n" << copy_constructor_tree <<std::endl;
     //COPY ASSIGNMENT
     bst<int, int> copy_assignement_tree{};
     copy_assignement_tree = tree;
-    std::cout<< "copy assignment tree: \n"<<copy_assignement_tree<<std::endl;
 
-
-    std::cout<<" "<<std::endl;
-    std::cout<<"print all the tree create with the copy constructor and the copy assignment witht he originale one \n"<<std::endl;
     std::cout<<"tree: \n"<<tree<<std::endl;
     std::cout<<"copy constructor tree: \n" << copy_constructor_tree <<std::endl;
     std::cout<<"copy assignment tree: \n"<<copy_assignement_tree<<std::endl;
-    */
+    
 
-    /*
+    
     //MOVE SEMANTIC TEST
     //MOVE CONSTRUCTOR
-    std::cout<<"test move semantics"<<std::endl;
+    std::cout<<"TEST move semantics"<<std::endl;
     bst<int,int> move_constructor_tree{std::move(tree)};
-    std::cout<<"move constructor tree: \n" << move_constructor_tree <<std::endl;
+    std::cout<<"move constructor tree: \n" << move_constructor_tree <<std::endl; //REMEBER TO CHANGE THE NAME IF WE WANT TO TEST MOVE ASSIGNEMNT
+    std::cout<<"tree: \n"<<tree<<std::endl;
 
     //MOVE ASSIGNMENT
-    //bst<int, int> move_assignement_tree{};
-    //move_assignement_tree = std::move(copy_constructor_tree); //USED A COPY CONSTRUCTOR
-    //std::cout<< "move assignment tree: \n"<<move_assignement_tree<<std::endl;
-
-
-    std::cout<<" "<<std::endl;
-    std::cout<<"print all the tree create with the move constructor and the move assignment witht he originale one \n"<<std::endl;
-    std::cout<<"move constructor tree: \n" << move_constructor_tree <<std::endl; //REMEBER TO CHANGE THE NAME IF WE WANT TO TST MOVE ASSIGNEMNT
-    std::cout<<"tree: \n"<<tree<<std::endl;
+    bst<int, int> move_assignement_tree{};
+    move_assignement_tree = std::move(copy_constructor_tree); //USED A COPY CONSTRUCTOR
+    std::cout<< "move assignment tree: \n"<<move_assignement_tree<<std::endl;
+    std::cout<< "copy constructor tree: \n"<<copy_constructor_tree<<std::endl;
     */
+    
 
     // TESTING ERASE
     // tree.erase(20);
