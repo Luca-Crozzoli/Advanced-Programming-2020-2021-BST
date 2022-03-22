@@ -69,24 +69,28 @@
  * an internal namespace
  */
 
-namespace internal {
+namespace internal
+{
 
   /**
    * Used to handle the optional message provided by the user.
    */
-  class MessageHandler {
-   public:
+  class MessageHandler
+  {
+  public:
     MessageHandler() = default;
-    MessageHandler(const MessageHandler&) = delete;
+    MessageHandler(const MessageHandler &) = delete;
 
     template <typename T>
-    inline MessageHandler& operator<<(const T& val) {
+    inline MessageHandler &operator<<(const T &val)
+    {
       _os << val;
       return *this;
     }
 
     template <typename T>
-    inline MessageHandler& operator<<(T* const& p) {
+    inline MessageHandler &operator<<(T *const &p)
+    {
       if (p == nullptr)
         _os << "nullptr";
       else
@@ -94,19 +98,21 @@ namespace internal {
       return *this;
     }
 
-    inline MessageHandler& operator<<(
-        std::ostream& (*basic_manipulator)(std::ostream&)) {
+    inline MessageHandler &operator<<(
+        std::ostream &(*basic_manipulator)(std::ostream &))
+    {
       _os << basic_manipulator;
       return *this;
     }
 
-    inline MessageHandler& operator<<(const bool b) {
+    inline MessageHandler &operator<<(const bool b)
+    {
       return *this << (b ? "true" : "false");
     }
 
     std::string get_string() const { return _os.str(); }
 
-   private:
+  private:
     std::ostringstream _os;
   };
 
@@ -115,27 +121,31 @@ namespace internal {
    * exception type
    */
   template <typename ET>
-  struct AssertHelper {
+  struct AssertHelper
+  {
     AssertHelper() = default;
-    void operator=(const MessageHandler& m) { throw ET{m.get_string()}; }
+    void operator=(const MessageHandler &m) { throw ET{m.get_string()}; }
   };
 
   /**
    * Used like /dev/null for the assertions when compiled in release mode
    */
-  class NullStream {
-   public:
+  class NullStream
+  {
+  public:
     template <typename T>
-    inline NullStream& operator<<(const T&) {
+    inline NullStream &operator<<(const T &)
+    {
       return *this;
     }
 
-    inline NullStream& operator<<(std::ostream& (*)(std::ostream&)) {
+    inline NullStream &operator<<(std::ostream &(*)(std::ostream &))
+    {
       return *this;
     }
   };
 
-}  // end namespace internal
+} // end namespace internal
 
 // now follows all the macros needed to provide the interface described at the
 // beginning of the file
@@ -146,40 +156,42 @@ namespace internal {
 
 // when the condition is not satisfied, an exception is thrown
 
-#define AP_ERROR(...)                                                          \
-  SELECT_MACRO(__VA_ARGS__, _AP_ERROR2, _AP_ERROR1, dummy)(__VA_ARGS__)
+#define AP_ERROR(...)                                      \
+  SELECT_MACRO(__VA_ARGS__, _AP_ERROR2, _AP_ERROR1, dummy) \
+  (__VA_ARGS__)
 
-#define _AP_ERROR2(cond, exception_type)                                       \
-  if (!(cond))                                                                 \
-  ::internal::AssertHelper<exception_type>{} =                                 \
-      internal::MessageHandler{}                                               \
-      << "\n\n"                                                                \
-      << "------------------------------------------------------------------"  \
-      << "\n"                                                                  \
-      << "A runtime exception has been thrown\n\n"                             \
-      << "       file: " << __FILE__ << '\n'                                   \
-      << "       line: " << __LINE__ << '\n'                                   \
-      << "   function: " << __PRETTY_FUNCTION__ << '\n'                        \
-      << "------------------------------------------------------------------"  \
+#define _AP_ERROR2(cond, exception_type)                                      \
+  if (!(cond))                                                                \
+  ::internal::AssertHelper<exception_type>{} =                                \
+      internal::MessageHandler{}                                              \
+      << "\n\n"                                                               \
+      << "------------------------------------------------------------------" \
+      << "\n"                                                                 \
+      << "A runtime exception has been thrown\n\n"                            \
+      << "       file: " << __FILE__ << '\n'                                  \
+      << "       line: " << __LINE__ << '\n'                                  \
+      << "   function: " << __PRETTY_FUNCTION__ << '\n'                       \
+      << "------------------------------------------------------------------" \
       << "\n\n"
 
 #define _AP_ERROR1(cond) _AP_ERROR2(cond, std::runtime_error)
 
-#define AP_ASSERT(...)                                                         \
-  SELECT_MACRO(__VA_ARGS__, _AP_ASSERT2, _AP_ASSERT1, dummy)(__VA_ARGS__)
+#define AP_ASSERT(...)                                       \
+  SELECT_MACRO(__VA_ARGS__, _AP_ASSERT2, _AP_ASSERT1, dummy) \
+  (__VA_ARGS__)
 
 #ifndef NDEBUG
-#  define _AP_ASSERT_(cond, exception_type) AP_ERROR(cond, exception_type)
+#define _AP_ASSERT_(cond, exception_type) AP_ERROR(cond, exception_type)
 #else
-#  define _AP_ASSERT_(cond, exception_type)                                    \
-    internal::NullStream {}
+#define _AP_ASSERT_(cond, exception_type) \
+  internal::NullStream {}
 #endif
 
 #define _AP_ASSERT(cond) _AP_ASSERT_(cond, std::runtime_error)
 
-#define _AP_ASSERT2(cond, extype)                                              \
+#define _AP_ASSERT2(cond, extype) \
   _AP_ASSERT_(cond, extype) << "  condition: " << #cond << " is not true\n\n"
 
 #define _AP_ASSERT1(cond) _AP_ASSERT2(cond, std::runtime_error)
 
-#endif  // __AP_ERROR_H__
+#endif // __AP_ERROR_H__
