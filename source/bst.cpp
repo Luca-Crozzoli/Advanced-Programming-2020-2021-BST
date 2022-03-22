@@ -139,9 +139,7 @@ public:
     // Copy assignment, standard way
     bst &operator=(const bst &x)
     {
-        /
-                std::cout
-            << "COPY ASSIGNMENT" << std::endl;
+        std::cout << "COPY ASSIGNMENT" << std::endl;
         root_node.reset(); // remember to release the memory we own
 
         auto tmp = x;           // copy constructor

@@ -1,1 +1,8 @@
-/Untitled-1
+# Ignore IDE specific files
+.vscode/
+
+#Ignore executable
+*.x
+
+#Ignore binary
+*.o
