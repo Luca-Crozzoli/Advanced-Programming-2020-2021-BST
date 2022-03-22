@@ -19,3 +19,10 @@ all: $(EXE)
 .PHONY: clean
 clean:
 	rm -f $(EXE) *~ 
+
+.PHONY: valgrind
+valgrind:
+	valgrind ./$(EXE)
+.PHONY: run
+run:
+	./$(EXE)

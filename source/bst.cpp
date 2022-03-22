@@ -573,8 +573,8 @@ int main()
 
     bst<int, int> tree{};
 
-    bst<int, int> tree2{};
-    tree2 = tree;
+    //bst<int, int> tree2{};
+    //tree2 = tree;
     std::cout << tree << std::endl;
     tree.insert(std::pair<int, int>(6, 1));
     std::cout << tree << std::endl;
