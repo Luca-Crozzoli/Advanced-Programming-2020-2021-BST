@@ -361,7 +361,7 @@ public:
             subtree_root_left,
             subtree_root_right
         };
-        // LAMBDA FUNCTION THE CAPTURED VARIABLES BECOME PARTS OF THE LAMBDA
+        // LAMBDA FUNCTION 
         auto get_root_subtree_type = [](Node *root_subtree)
         {
             Node *parent = root_subtree->parent;
@@ -380,7 +380,7 @@ public:
             }
         };
 
-        // LAMBDA FUNCTION THE CAPTURED VARIABLES BECOME PARTS OF THE LAMBDA
+        // LAMBDA FUNCTION 
         auto transplant_tree = [this](Node *root_transplant, root_subtree_type rst, Node *graft)
         {
             Node *parent = root_transplant->parent;
