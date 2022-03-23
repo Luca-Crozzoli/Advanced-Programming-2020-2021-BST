@@ -428,7 +428,7 @@ public:
             {
                 transplant_tree(left_most, left_most_rst, left_most->right.release());
                 left_most->right.reset(remove->right.release());
-                left_most->right.get()->parent = left_most;
+                left_most->right.get()->parent = left_most; //update the parent pointer
             }
 
             Node *left_child_of_remove = remove->left.release(); /* we save the left_child_of_remove because when we call transplant_tree
@@ -437,7 +437,7 @@ public:
 
             transplant_tree(remove, get_root_subtree_type(remove), left_most);
             left_most->left.reset(left_child_of_remove);
-            left_most->left.get()->parent = left_most;
+            left_most->left.get()->parent = left_most; //update the parent pointer
         }
 
         --tree_size;
