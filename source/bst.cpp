@@ -381,46 +381,46 @@ public:
         };
 
         // LAMBDA FUNCTION THE CAPTURED VARIABLES BECOME PARTS OF THE LAMBDA
-        auto transplant_tree = [this](Node *root_transplant, root_subtree_type rst, Node *transplant)
+        auto transplant_tree = [this](Node *root_transplant, root_subtree_type rst, Node *graft)
         {
             Node *parent = root_transplant->parent;
 
             if (rst == root_subtree_type::subtree_root)
             {
-                root_node.reset(transplant);
+                root_node.reset(graft);
             }
             else if (rst == root_subtree_type::subtree_root_left)
-            { /*else if(remove == parent->left.get())!!____WARNING___!!
-             don't have any more the ownership RETURN NULLPTR!!*/
-                parent->left.reset(transplant);
+            { /*SOLVED BY USING LAMBDA FUNCTIONS: else if(remove == parent->left.get())!!____WARNING___!!
+             don't have anymore the ownership RETURN NULLPTR!!*/
+                parent->left.reset(graft);
             }
             else
             {
-                parent->right.reset(transplant);
+                parent->right.reset(graft);
             }
 
-            if (transplant)
+            if (graft)
             {
-                transplant->parent = parent;
+                graft->parent = parent;
             }
         };
 
-        if (remove->left.get() == nullptr)
-        { // Node remove have only right child
+        if (remove->left.get() == nullptr)// node "remove" have only the right child
+        { 
             transplant_tree(remove, get_root_subtree_type(remove), remove->right.release());
         }
-        else if (remove->right.get() == nullptr)
-        { // node remove have only left child
+        else if (remove->right.get() == nullptr) // node "remove" have only the left child
+        { 
             transplant_tree(remove, get_root_subtree_type(remove), remove->left.release());
         }
-        else
-        { // Node remove have both left and right child
+        else // node "remove" have both left and right child
+        { 
             Node *left_most = get_left_most(remove->right.get());
-            /*To solve the !!___WARNIING___!! inside the transplant tree function we first need to know
-            the type of the node before it will be relased, to fall in the corret if statement in the transplant
+            /* SOLVED BY USING LAMBDA FUNCTIONS:To solve the !!___WARNIING___!! inside the transplant tree function, we first need to know
+            the type of the node before it will be released to fall in the correct if statement in the transplant
             function.
-            IF WE DON'T DO THAHT BEFORE THE RELASE WE ENCOUNTER THE WARNING BECAUSE WE ARE ACESSING A NODE
-            WITH GET WHEN WE CALL TRANSPLANT_TREE IN LINE 342 (GET RETRUN NULL BECAUSE THE POINTER WAS PREVIOUSLY RELASED!!)*/
+            IF WE DON'T DO THAT BEFORE THE RELEASE WE ENCOUNTER THE WARNING BECAUSE WE ARE ACCESSING A NODE
+            WITH GET WHEN WE CALL TRANSPLANT_TREE (GET RETURN NULL BECAUSE THE POINTER WAS RELASED!!)*/
             auto left_most_rst = get_root_subtree_type(left_most);
             release_node(left_most);
 
@@ -431,8 +431,8 @@ public:
                 left_most->right.get()->parent = left_most;
             }
 
-            Node *left_child_of_remove = remove->left.release(); /* we save the left_child_of_remove  because when we call transplant_tree
-                                                                 the remove node is delted and we can not acess anymore the left child of
+            Node *left_child_of_remove = remove->left.release(); /* we save the left_child_of_remove because when we call transplant_tree
+                                                                 the remove node is deleted and we can not access anymore the left child of
                                                                  remove by using remove.*/
 
             transplant_tree(remove, get_root_subtree_type(remove), left_most);
@@ -473,7 +473,7 @@ public:
 // IMPLEMENTATION OF THE ITERATOR
 /*Class for the iterator of bst.
 According to the bst class we have
--key_type the type of the key to identify each single node
+-key_type the type of the key to identifying each single node
 -val_type the type of the value stored in each node
 -OP the operator used to compare the keys of the nodes (default std::less)
 - O Type of the object pointed by an instance of _Iterator. WE ARE INTERESTED IN pair_data
@@ -486,7 +486,7 @@ class bst<key_type, val_type, OP>::_Iterator
     node *current;
 
 public:
-    using value_type = O; // i want the iterator to reference the pair_data, in fact O can be a const std::pair or a simple std::pair
+    using value_type = O; // The iterator reference the pair_data, in fact, O can be a const std::pair or a simple std::pair
     using reference = value_type &;
     using pointer = value_type *;
     using difference_type = std::ptrdiff_t;
@@ -498,34 +498,34 @@ public:
     // Dereference operator *
     reference operator*() const { return current->pair_data; }
 
-    // Arrow operatro ->
+    // Arrow operator ->
     pointer operator->() const { return &**this; }
 
-    // Pre-increment, we move to th next node in the tree considering the order of navigation
+    // Pre-increment, we move to the next node in the tree considering the order of navigation
     _Iterator &operator++()
     {
-        if (!current)
-        { // current == nullptr
+        if (!current)// current == nullptr
+        { 
             return *this;
         }
-        else if (current->right)
-        {                                   // if the current node has a right child i have to go to the left most node from the right child
-            current = current->right.get(); // return the raw pointer to the right child fo current
+        else if (current->right) // if the current node has a right child go to the left most node from the right child
+        {                                   
+            current = current->right.get(); // update current 
             while (current->left)
-            { // until there are left child move always on the left
+            { // as long as there are left children always move to the left
                 current = current->left.get();
             }
         }
-        // current = last left node -> retrun the parent
+        // current = last left node -> return the parent
         // current = last right node -> you reach the end of the tree go back to parents until null pointer
-        else
-        { // If the current node doesn't have right subtree the next node is the first ancestor of current which left son is also an ancestor of current
+        else // If the current node doesn't have the right node the next node is the first ancestor of the current node, which left son is also an ancestor of the current 
+        { 
             node *tmp = current->parent;
 
             while (tmp && tmp->right.get() == current)
-            {                      // current = last right node in respect to the root -> go back until current = root node
-                current = tmp;     // move to the father
-                tmp = tmp->parent; // tmp will be the grandhfather
+            {                     
+                current = tmp;     
+                tmp = tmp->parent; 
             }
             current = tmp;
         }
@@ -536,7 +536,7 @@ public:
     _Iterator operator++(int)
     {
         auto tmp{*this};
-        ++(*this); // call the pre increment on ourselfs
+        ++(*this); // call the pre-increment on ourselves
         return tmp;
     }
 
@@ -549,7 +549,7 @@ public:
     // operator !=
     friend bool operator!=(const _Iterator &a, const _Iterator &b)
     {
-        return !(a == b); // we call the previous == operatro defined before!!
+        return !(a == b); // we call the previous == operator defined before!!
     }
 
     // get the current pointer to the node
@@ -602,7 +602,7 @@ int main()
     // }
 
     // TESTING THE OPERATOR []
-    // int keyop = 5; //we search fro a key which is not present, we simple add a new node with a default value!!
+    // int keyop = 5; //we search for a key which is not present, we simple add a new node with a default value!!
     // auto value_L= tree[keyop]; //L value
     // auto value_R = tree[2]; //R value
 
