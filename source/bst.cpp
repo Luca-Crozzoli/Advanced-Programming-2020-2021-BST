@@ -361,8 +361,8 @@ public:
             subtree_root_left,
             subtree_root_right
         };
-        // LAMBDA FUNCTION THE CAPTURED VARABLES BECOME PARTS OF THE LAMBDA
-        auto get_root_subtree_type = [this](Node *root_subtree)
+        // LAMBDA FUNCTION THE CAPTURED VARIABLES BECOME PARTS OF THE LAMBDA
+        auto get_root_subtree_type = [](Node *root_subtree)
         {
             Node *parent = root_subtree->parent;
 
@@ -639,7 +639,8 @@ int main()
     
 
     // TESTING ERASE
-    // tree.erase(20);
+     tree.erase(6);
+     std::cout<<tree<<std::endl;
 
 
     return 0;
