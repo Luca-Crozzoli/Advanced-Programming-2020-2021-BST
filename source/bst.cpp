@@ -1,9 +1,9 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator> // std::forward_iterator_tag;
-#include <memory>   //std::unique_pytr
+#include <memory>   // std::unique_pytr
 #include <utility>  // std::move
-#include <vector>   //std::vector used to create a vector of pair for the balance function
+#include <vector>   // std::vector used to create a vector of pairs for the balance function
 #include "ap_error.h"
 
 template <typename key_type, typename val_type, typename OP = std::less<key_type>>
