@@ -636,26 +636,26 @@ public:
 int main()
 {
     bst<int, int> tree{};
-    std::pair<int,int> my_pair{6,1};
 
     bst<int, int> tree2{};
     tree2 = tree;
     std::cout << tree << std::endl;
-    tree.insert(my_pair);
+    tree.insert(std::pair<int, int>(6, 12));
     std::cout << tree << std::endl;
-    tree.insert(std::pair<int, int>(1, 2));
+    tree.insert(std::pair<int, int>(1, 20));
     std::cout << tree << std::endl;
-    tree.insert(std::pair<int, int>(15, 1));
+    tree.insert(std::pair<int, int>(15, 27));
     std::cout << tree << std::endl;
-    tree.insert(std::pair<int, int>(12, 2));
+    tree.insert(std::pair<int, int>(12, 30));
     std::cout << tree << std::endl;
-    tree.insert(std::pair<int, int>(13, 2));
+    tree.insert(std::pair<int, int>(13, 40));
     std::cout << tree << std::endl;
 
 
     // TESTING EMPLACE
-    tree.emplace(5,20);
-    std::cout << tree <<std::endl;
+    //tree.emplace(5,400);
+    //std::cout << tree <<std::endl;
+
 
     // TESTING CLEAR
     // tree.clear();
@@ -668,10 +668,9 @@ int main()
     // }
 
     // TESTING THE OPERATOR []
-    // int keyop = 5; //we search for a key which is not present, we simple add a new node with a default value!!
+    // int keyop = 15; //we search for a key which is not present, we simple add a new node with a default value!!
     // auto value_L= tree[keyop]; //L value
-    // auto value_R = tree[2]; //R value
-
+    // auto value_R = tree[6]; //R value
     // std::cout<<"value_Lop[]:"<<value_L<<"  value_Rop[]:"<<value_R<<std::endl;
 
     /*
