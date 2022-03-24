@@ -270,20 +270,20 @@ public:
     }
 
     // SUBSCRIPTING OPERATOR____________________________________________________________________________________________________________________________________________________
-    /*retruns a reference to the value thaht is mapped to a key equivalent to x, perfroming
+    /* returns a reference to the value thaht is mapped to a key equivalent to x, performing
     an insertion if such key does not already exist*/
 
     val_type &operator[](const key_type &x)
     {
         std::cout << "L-value operator[]" << std::endl;
         iterator my_iterator{find(x)};
-        if (my_iterator.get_current())
-        { // if current pointer of the iterator is different from nullptr there is a node with that key
+        if (my_iterator.get_current())// if the current pointer of the iterator is different from nullptr there is a node with that key
+        { 
             return my_iterator->second;
         }
-        else
+        else // create a new pair and insert a new node with that pair in the tree (value is the default)
         {
-            insert({x, {}}); // create a new pair and insert a new node with thah pair in the tree (value is default)
+            insert({x, {}}); 
             return find(x)->second;
         }
     }
@@ -292,49 +292,19 @@ public:
     {
         std::cout << "R-value operator[]" << std::endl;
         iterator my_iterator{find(x)};
-        if (my_iterator.get_current())
-        { // if current pointer of the iteratro is different from nullptr there is a node with that key
+        if (my_iterator.get_current()) // if the current pointer of the iterator is different from nullptr there is a node with that key
+        { 
             return my_iterator->second;
         }
-        else
+        else // create a new pair and insert a new node with that pair in the tree (value is the default)
         {
-            insert({x, {}}); // create a new pair and insert a new node with thath pair in the tree (value is default)
+            insert({x, {}}); 
             return find(x)->second;
         }
     }
 
-    // RELEASE NODE
-    /*function thath realse the node passed as argument from it's parent by releasing the left and rigth parent's unique pointers.
-    It retruns a pointer to the released node*/
-
-    Node *release_node(const Node *node_to_release)
-    {
-        if (node_to_release->parent == nullptr)
-        { // if the node is a root node we relase the root
-            return root_node.release();
-        }
-
-        if (node_to_release->parent->left.get() == node_to_release)
-        { // if the node is a left child we release the parent left pointer
-            return node_to_release->parent->left.release();
-        }
-
-        return node_to_release->parent->right.release(); // otherwise the node is a right child, we relase the right pointer of the parent
-    }
-
-    // GET_LEFT_MOST
-    /* function thaht retrurns a pointer to the left most node from a subtree with the root passed as argument*/
-    Node *get_left_most(Node *node) noexcept
-    {
-        while (node && node->left.get())
-        {
-            node = node->left.get();
-        }
-        return node;
-    }
-
     // ERASE_________________________________________________________________________________________________________________________
-    /*removes the element (if one exists) with the key equivalent ot key mantaining the order of the tree*/
+    /* removes the element (if one exists) with the key equivalent to key passed as argument maintaining the order of the tree*/
     void erase(const key_type &x)
     {
 
@@ -361,7 +331,38 @@ public:
             subtree_root_left,
             subtree_root_right
         };
-        // LAMBDA FUNCTION 
+
+        // RELEASE NODE LMABDA
+        /* function that releases the node passed as argument from its parent by releasing the left and right parent's unique pointers.
+        It returns a pointer to the released node*/
+        auto release_node = [this](const Node *node_to_release)
+        {
+            if (node_to_release->parent == nullptr) // if the node is a root node we release the root
+            {
+                return root_node.release();
+            }
+
+            if (node_to_release->parent->left.get() == node_to_release) // if the node is a left child we release the parent left pointer
+            {
+                return node_to_release->parent->left.release();
+            }
+
+            return node_to_release->parent->right.release(); // otherwise the node is a right child, we relase the right pointer of the parent
+        };
+
+        // GET_LEFT_MOST_FROM_ROOT_SUBTREE LAMBDA
+        /* function that returns a pointer to the left most node from a subtree with the root passed as argument*/
+        auto get_left_most_from_root_subtree = [](Node *root_subtree) noexcept
+        {
+            while (root_subtree && root_subtree->left.get())
+            {
+                root_subtree = root_subtree->left.get();
+            }
+            return root_subtree;
+        };
+
+        // GET_ROOT_SUBTREE_TYPE LAMBDA
+        /* function that establishes the kind of node root_subtree that has to be transplanted: root, left child or right_child*/
         auto get_root_subtree_type = [](Node *root_subtree)
         {
             Node *parent = root_subtree->parent;
@@ -380,71 +381,71 @@ public:
             }
         };
 
-        // LAMBDA FUNCTION 
-        auto transplant_tree = [this](Node *root_transplant, root_subtree_type rst, Node *graft)
+        // TRANSPLANT_TREE LAMBDA
+        /* function that substitutes a subtree with root root_subtree, with another subtree with root root_graft_subtree
+        according to the type of root_subtree determined by the get_root_subtree_type which provides
+        the second argument for this function*/
+        auto transplant_tree = [this](Node *root_subtree, root_subtree_type rst, Node *root_graft_subtree)
         {
-            Node *parent = root_transplant->parent;
+            Node *parent = root_subtree->parent;
 
             if (rst == root_subtree_type::subtree_root)
             {
-                root_node.reset(graft);
+                root_node.reset(root_graft_subtree);
             }
             else if (rst == root_subtree_type::subtree_root_left)
-            { /*SOLVED BY USING LAMBDA FUNCTIONS: else if(remove == parent->left.get())!!____WARNING___!!
-             don't have anymore the ownership RETURN NULLPTR!!*/
-                parent->left.reset(graft);
+            {
+                parent->left.reset(root_graft_subtree);
             }
             else
             {
-                parent->right.reset(graft);
+                parent->right.reset(root_graft_subtree);
             }
 
-            if (graft)
+            if (root_graft_subtree)
             {
-                graft->parent = parent;
+                root_graft_subtree->parent = parent;
             }
         };
 
-        if (remove->left.get() == nullptr)// node "remove" have only the right child
-        { 
+        if (remove->left.get() == nullptr) // node "remove" have only the right child
+        {
             transplant_tree(remove, get_root_subtree_type(remove), remove->right.release());
         }
         else if (remove->right.get() == nullptr) // node "remove" have only the left child
-        { 
+        {
             transplant_tree(remove, get_root_subtree_type(remove), remove->left.release());
         }
         else // node "remove" have both left and right child
-        { 
-            Node *left_most = get_left_most(remove->right.get());
-            /* SOLVED BY USING LAMBDA FUNCTIONS:To solve the !!___WARNIING___!! inside the transplant tree function, we first need to know
-            the type of the node before it will be released to fall in the correct if statement in the transplant
-            function.
-            IF WE DON'T DO THAT BEFORE THE RELEASE WE ENCOUNTER THE WARNING BECAUSE WE ARE ACCESSING A NODE
-            WITH GET WHEN WE CALL TRANSPLANT_TREE (GET RETURN NULL BECAUSE THE POINTER WAS RELASED!!)*/
-            auto left_most_rst = get_root_subtree_type(left_most);
+        {
+            Node *left_most = get_left_most_from_root_subtree(remove->right.get());
+            auto left_most_rst = get_root_subtree_type(left_most); /* We need to know the type left_most node, if it is a right or left child.
+                                                                   Do that before the release of the node from its parent because after the release we can not access anymore the parent
+                                                                   to establish the type of the node*/
             release_node(left_most);
 
             if (left_most->parent != remove)
             {
                 transplant_tree(left_most, left_most_rst, left_most->right.release());
                 left_most->right.reset(remove->right.release());
-                left_most->right.get()->parent = left_most; //update the parent pointer
+                left_most->right.get()->parent = left_most; // update the parent pointer
             }
 
-            Node *left_child_of_remove = remove->left.release(); /* we save the left_child_of_remove because when we call transplant_tree
-                                                                 the remove node is deleted and we can not access anymore the left child of
-                                                                 remove by using remove.*/
+            Node *left_child_of_remove = remove->left.release(); /* We save the left_child_of_remove because we need it to update the
+                                                                 left pointer of the lef_most node after the transpalnt_tree call. 
+                                                                 We can not access anymore the left child of
+                                                                 remove by using remove because we release its left pointer.*/
 
             transplant_tree(remove, get_root_subtree_type(remove), left_most);
             left_most->left.reset(left_child_of_remove);
-            left_most->left.get()->parent = left_most; //update the parent pointer
+            left_most->left.get()->parent = left_most; // update the parent pointer
         }
 
         --tree_size;
     }
 
     // PUT TO OPERATOR________________________________________________________________________________________________________________
-    /*Overloading of the << operator. This function print the
+    /* Overloading of the << operator. This function print the
     tree in order using the iterator*/
     friend std::ostream &operator<<(std::ostream &os, const bst &x)
     {
@@ -471,7 +472,7 @@ public:
 };
 
 // IMPLEMENTATION OF THE ITERATOR
-/*Class for the iterator of bst.
+/* Class for the iterator of bst.
 According to the bst class we have
 -key_type the type of the key to identifying each single node
 -val_type the type of the value stored in each node
@@ -504,13 +505,13 @@ public:
     // Pre-increment, we move to the next node in the tree considering the order of navigation
     _Iterator &operator++()
     {
-        if (!current)// current == nullptr
-        { 
+        if (!current) // current == nullptr
+        {
             return *this;
         }
         else if (current->right) // if the current node has a right child go to the left most node from the right child
-        {                                   
-            current = current->right.get(); // update current 
+        {
+            current = current->right.get(); // update current
             while (current->left)
             { // as long as there are left children always move to the left
                 current = current->left.get();
@@ -518,14 +519,14 @@ public:
         }
         // current = last left node -> return the parent
         // current = last right node -> you reach the end of the tree go back to parents until null pointer
-        else // If the current node doesn't have the right node the next node is the first ancestor of the current node, which left son is also an ancestor of the current 
-        { 
+        else // If the current node doesn't have the right node the next node is the first ancestor of the current node, which left son is also an ancestor of the current
+        {
             node *tmp = current->parent;
 
             while (tmp && tmp->right.get() == current)
-            {                     
-                current = tmp;     
-                tmp = tmp->parent; 
+            {
+                current = tmp;
+                tmp = tmp->parent;
             }
             current = tmp;
         }
@@ -596,7 +597,7 @@ int main()
     // std::cout<<tree<<std::endl;
 
     // TESTING FIND
-    //int key = 15;
+    // int key = 15;
     // if((*tree.find(key)).first == key ){
     //    std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
     // }
@@ -620,9 +621,9 @@ int main()
     std::cout<<"tree: \n"<<tree<<std::endl;
     std::cout<<"copy constructor tree: \n" << copy_constructor_tree <<std::endl;
     std::cout<<"copy assignment tree: \n"<<copy_assignement_tree<<std::endl;
-    
 
-    
+
+
     //MOVE SEMANTIC TEST
     //MOVE CONSTRUCTOR
     std::cout<<"TEST move semantics"<<std::endl;
@@ -636,12 +637,10 @@ int main()
     std::cout<< "move assignment tree: \n"<<move_assignement_tree<<std::endl;
     std::cout<< "copy constructor tree: \n"<<copy_constructor_tree<<std::endl;
     */
-    
 
     // TESTING ERASE
-     tree.erase(6);
-     std::cout<<tree<<std::endl;
-
+    tree.erase(6);
+    std::cout << tree << std::endl;
 
     return 0;
 }
