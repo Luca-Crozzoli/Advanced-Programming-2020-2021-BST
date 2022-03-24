@@ -5,7 +5,6 @@
 #include <utility>  // std::move
 #include <vector>   //std::vector used to create a vector of pair for the balance function
 #include "ap_error.h"
-using namespace std;
 
 template <typename key_type, typename val_type, typename OP = std::less<key_type>>
 class bst
@@ -22,15 +21,15 @@ class bst
         Node *get_right() const noexcept { return right.get(); }
 
         // L-VALUE
-        /*Constructor for Node called by insert when tree is empty*/
+        /*Constructor for Node called by insert when the tree is empty*/
         explicit Node(const std::pair<const key_type, val_type> &x) : pair_data{x}, parent{nullptr} { std::cout << "l-value 1 arg\n"; }
-        /*Constructor for Node called by insert when tree is no more empty, set in a proper way the parent pointer*/
+        /*Constructor for Node called by insert when the tree is no more empty, set in a proper way the parent pointer*/
         Node(const std::pair<const key_type, val_type> &x, Node *p) : pair_data{x}, parent{p} { std::cout << "l-value 2 arg\n"; }
 
         // R-VALUE
-        /*Constructor for Node called by insert when tree is empty*/
+        /*Constructor for Node called by insert when the tree is empty*/
         explicit Node(std::pair<const key_type, val_type> &&x) : pair_data{std::move(x)}, parent(nullptr) { std::cout << "r-value 1 arg" << std::endl; }
-        /*Constructor for Node called by insert when tree is no more empty, set in a proper way the parent pointer*/
+        /*Constructor for Node called by insert when the tree is no more empty, set in a proper way the parent pointer*/
         Node(std::pair<const key_type, val_type> &&x, Node *p) : pair_data{std::move(x)}, parent{p} { std::cout << "r-value 2 arg" << std::endl; }
 
         /*Destructor of Node*/
@@ -38,12 +37,11 @@ class bst
     };
 
     // COPY FUNCTION CALLED ITERATIVELY TO COPY ALL THE TREE
-    /*copy function called iteratively to perfrom a deep copy of the tree when we use the copy constructor
-     */
+    /*copy function called iteratively to perform a deep copy of the tree when we use the copy constructor*/
     void __copy(const std::unique_ptr<Node> &up)
     {
-        if (up)
-        { // if unique pointer != empty (it contains a raw pointer)
+        if (up)// if unique pointer != empty (it contains a raw pointer)
+        { 
             insert(up->pair_data);
             __copy(up->left);
             __copy(up->right);
@@ -55,7 +53,7 @@ public:
     std::size_t tree_size;
     OP op;
 
-    // DEFAULT CONSTRUCTOR AND DESTRUCTOR (default is enoguh because we dont' have raw pointers_______________________________________________________
+    // DEFAULT CONSTRUCTOR AND DESTRUCTOR default is enough because we don't have raw pointers_______________________________________________________
     bst() = default;
     ~bst() noexcept = default;
 
@@ -66,7 +64,7 @@ public:
     using iterator = _Iterator<std::pair<const key_type, val_type>>;             // we pass the templated pair
     using const_iterator = _Iterator<const std::pair<const key_type, val_type>>; // we pass the const templated pair
 
-    // BEGIN (for the range for loop which uses the iteratro) noexcept because we are not acquiring resources_____________________________________________
+    // BEGIN (for the range for loop which uses the iterator) noexcept because we are not acquiring resources_____________________________________________
     iterator begin() noexcept
     {
         Node *tmp = root_node.get();
@@ -87,12 +85,13 @@ public:
     }
     const_iterator cbegin() const noexcept { return begin(); }
 
-    // END (for the range for loop which uses the iterator) noexcept because we are not acquairing resources__________________________________________________________________________
+    // END (for the range for loop which uses the iterator) noexcept because we are not acquiring resources_________________________________________________________
     iterator end() noexcept { return iterator{nullptr}; }
     const_iterator end() const noexcept { return const_iterator{nullptr}; }
     const_iterator cend() const noexcept { return const_iterator{nullptr}; };
 
     // FIND_________________________________________________________________________________________________________________________________________________________
+    /* find a given key. if the key is present, retuns an iterator to the poper node, end() otherwise*/
     iterator find(const key_type &x) noexcept
     {
         for (iterator my_iterator{begin()}; my_iterator != end(); ++my_iterator)
@@ -117,12 +116,12 @@ public:
     };
 
     // COPY AND MOVE SEMANTICS FOR THE BST____________________________________________________________________________________________________________________________
-    // Move constructor (default because no raw pointers)
+    // move constructor (default because no raw pointers)
     bst(bst &&) noexcept = default;
     // move assignment (default because no raw pointers)
     bst &operator=(bst &&) noexcept = default;
 
-    // Copy constructro for a deep copy
+    // Copy constructor for a deep copy
     bst(const bst &x) : tree_size{}
     {
         std::cout << "COPY CONSTRUCTOR" << std::endl;
@@ -130,7 +129,7 @@ public:
         {
             AP_ERROR(x.root_node) << "Nothing to copy the tree is empty";
         }
-        catch (const exception &e)
+        catch (const std::exception &e)
         {
             std::cout << e.what() << std::endl;
         }
@@ -148,11 +147,12 @@ public:
     }
 
     // INSERT___________________________________________________________________________________________________________________________________________________________________
-    // here we define 2 insert functions calling the function _insert which uses the forwarding to avoid code duplication
-    // to take only in one function r and l values
+    /*here we define 2 insert functions calling the function _insert which uses the forwarding
+    to avoid code duplication to take only in one function both r and l values*/
+
     template <typename P>
-    std::pair<iterator, bool> _insert(P &&x)
-    { // forwarding is not a n r-value
+    std::pair<iterator, bool> _insert(P &&x)// forwarding is not a n r-value
+    { 
         std::cout << "forwarding _insert" << std::endl;
         auto tmp = root_node.get();
         while (tmp)
@@ -212,7 +212,7 @@ public:
     }
 
     // EMPLACE FORWARDING REFERENCE STD::FORWARD _______________________________________________________________________________________
-    /*Inserts a new element into the container constructed in-place with
+    /* inserts a new element into the container constructed in-place with
     the given args if there is no element with the key in the container.*/
     template <class... Types>
     std::pair<iterator, bool> emplace(Types &&...args)
@@ -223,7 +223,7 @@ public:
     // CLEAR________________________________________________________________________________________________________________________________________
     void clear()
     {
-        root_node.reset(); // we just delete root_node becuase due to unique pointers all the nodes in the tree will be deleted
+        root_node.reset(); // reset root node to nullptr because due to unique pointers, all the nodes in the tree will be deleted
         tree_size = 0;
     }
 
@@ -239,32 +239,32 @@ public:
     void insert_balance(std::vector<std::pair<const key_type, val_type>> &vec, int sindex, int eindex)
     {
         if (sindex == eindex)
-        { // there is only one element in the portion of the vector we fall in this when we analyze RIGHT PART
+        { 
             insert(vec[sindex]);
             return;
         }
         if (sindex > eindex)
-        { // we fall in this when we are considering the LEFT PART: WE NEED THIS BCEAUSE THE RESULT OF THE DIVISION IS FLOOR
+        { 
             return;
         }
-        int middle_index = (sindex + eindex) / 2;
+        int middle_index = (sindex + eindex) / 2; // floor rounding
 
         insert(vec[middle_index]);
-        insert_balance(vec, sindex, middle_index - 1); // we balance the LEFT PART from 0 to middel-1
-        insert_balance(vec, middle_index + 1, eindex); // we balance the RIGHT PART from middle+1 to size-1
+        insert_balance(vec, sindex, middle_index - 1); // balance the LEFT PART from 0 to middle-1
+        insert_balance(vec, middle_index + 1, eindex); // balance the RIGHT PART from middle+1 to size-1
     }
 
     void balance()
     {
         std::vector<std::pair<const key_type, val_type>> vector_pairs;
-        for (auto elem : *this)
-        { // we are looping trough the object that calls the balance function ( a bst tree and with the range for loop we copy the  std::pairs)
+        for (auto elem : *this)// looping through the object that calls the balance function ( a bst tree) and copying the std::pairs in the vector
+        { 
             vector_pairs.push_back(elem);
         }
 
         clear(); // we clear the bst tree which calls the function balance
 
-        // N.B. pairs of each node in the tree are inserted in the vector in order according to the defintion of the operatro++ for the iterator
+        // pairs of each node in the tree are inserted in the vector in order according to the definition of the operator++ for the iterator
         int vector_pairs_size = vector_pairs.size();
         insert_balance(vector_pairs, 0, vector_pairs_size - 1);
     }
@@ -315,7 +315,7 @@ public:
         {
             AP_ERROR(remove) << "Node to erase doesn't exist";
         }
-        catch (const exception &e)
+        catch (const std::exception &e)
         {
             std::cout << e.what() << std::endl;
         }
