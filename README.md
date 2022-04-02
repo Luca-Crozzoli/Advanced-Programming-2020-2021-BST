@@ -10,9 +10,9 @@ Implementation of a **template** binary search tree (BST).
 - `make valgrind` to run the code after the compilation with valgrind to check if there are memory leaks.
 
 ## Short report
-### What I understoor
+### What I understood
 - How to worte and how to use a Makefile
-- clarify the concepts introudced in the lecture
+- clarify the concepts introudced in the lectures
 - know something more about the alogrithms behind the BST
 
 
