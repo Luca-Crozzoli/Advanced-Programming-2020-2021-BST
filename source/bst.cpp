@@ -475,7 +475,7 @@ public:
             {
                 parent->right.reset(root_graft_subtree);
             }
-
+            /**/
             if (root_graft_subtree)
             {
                 root_graft_subtree->parent = parent; //update the parent pointer
