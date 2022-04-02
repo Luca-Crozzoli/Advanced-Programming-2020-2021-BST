@@ -276,12 +276,10 @@ public:
 
     /** INSERT_BALANCE
      * Recursive function for balancing the tree.
-     * Given a sorted vector (in ascending order respect to key) of node's pair (key value),
-     * this function takes the median (floor rounding) element of the vector
-     * and inserts the corresponding element in the tree.
-     * Then, this function recursively calls itself twice:
-     * one time with the left part of the vector and
-     * another time with the right part of the vector (median excluded)
+     * Given a sorted vector (ascending key order) of node's pair, function takes the median 
+     * (floor rounding) element of the vector and inserts the corresponding element in the tree.
+     * Then, recursively calls itself twice: one time with the left part of the vector and
+     * another time with the right part of the vector
      * @param vec vector of sorted pairs.
      * @param sindex start index of the vector
      * @param eindex end index of the vector
@@ -306,7 +304,7 @@ public:
     }
 
     /** BALANCE
-     * save the pairs of the three in order of key in a vector and clear the tree. after call the insert
+     * save the pairs of the tree in order of key in a vector and clear the tree. after call the insert
      * balance function
      */
     void balance()
@@ -340,7 +338,7 @@ public:
         }
         else // create a new pair and insert a new node with that pair in the tree (value is the default)
         {
-            insert({x, {}});
+            insert({x, {}}); //here we construct a pair using {}
             return find(x)->second;
         }
     }
@@ -396,7 +394,7 @@ public:
             subtree_root_right
         };
 
-        /** RELEASE NODE LMABDA
+        /** RELEASE NODE LAMBDA
          * function that releases the node passed as argument from its parent by releasing the left and right parent's unique pointers.
          * It returns a pointer to the released node
          * @param node_to_relase the node to be released
@@ -434,7 +432,7 @@ public:
         /** GET_ROOT_SUBTREE_TYPE LAMBDA
          * function that establishes the kind of node root_subtree that has to be transplanted: root, left child or right_child
          * @param root_subtree the root of subtree
-         * @returns the kind of the root subtree left-child right child or root of the whole tree
+         * @returns the kind of the root_subtree left-child right child or root 
          */
         auto get_root_subtree_type = [](Node *root_subtree)
         {
@@ -480,7 +478,7 @@ public:
 
             if (root_graft_subtree)
             {
-                root_graft_subtree->parent = parent;
+                root_graft_subtree->parent = parent; //update the parent pointer
             }
         };
 
@@ -495,7 +493,7 @@ public:
         else // node "remove" have both left and right child
         {
             Node *left_most = get_left_most_from_root_subtree(remove->right.get());
-            auto left_most_rst = get_root_subtree_type(left_most); /* We need to know the type left_most node, if it is a right or left child.
+            auto left_most_rst = get_root_subtree_type(left_most); /* We need to know the type of left_most node, if it is a right or left child.
                                                                    Do that before the release of the node from its parent because after the release we can not access anymore the parent
                                                                    to establish the type of the node*/
             release_node(left_most);
@@ -508,7 +506,7 @@ public:
             }
 
             Node *left_child_of_remove = remove->left.release(); /* We save the left_child_of_remove because we need it to update the
-                                                                 left pointer of the lef_most node after the transpalnt_tree call.
+                                                                 left pointer of the lef_most node after the transplant_tree call.
                                                                  We can not access anymore the left child of
                                                                  remove by using remove because we release its left pointer.*/
 
@@ -521,7 +519,7 @@ public:
     }
 
     /** PUT TO OPERATOR
-     * Overloading of the << operator. This function print the
+     * Overloading of the << operator. This function prints the
      * tree in order using the iterator
      * @param os reference to the output stream
      * @param x reference to the bst
