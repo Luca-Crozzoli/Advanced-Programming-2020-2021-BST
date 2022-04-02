@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator> // std::forward_iterator_tag;
-#include <memory>   // std::unique_pytr
+#include <memory>   // std::unique_ptr
 #include <utility>  // std::move
 #include <vector>   // std::vector used to create a vector of pairs for the balance function
 #include "ap_error.h"
@@ -28,15 +28,15 @@ class bst
 
         // L-VALUE
         /*Constructor for Node called by insert when the tree is empty*/
-        explicit Node(const std::pair<const key_type, val_type> &x) : pair_data{x}, parent{nullptr} { std::cout << "l-value 1 arg\n"; }
+        explicit Node(const std::pair<const key_type, val_type>& x) : pair_data{x}, parent{nullptr} { std::cout << "l-value 1 arg\n"; }
         /*Constructor for Node called by insert when the tree is no more empty, set in a proper way the parent pointer*/
-        Node(const std::pair<const key_type, val_type> &x, Node *p) : pair_data{x}, parent{p} { std::cout << "l-value 2 arg\n"; }
+        Node(const std::pair<const key_type, val_type>& x, Node *p) : pair_data{x}, parent{p} { std::cout << "l-value 2 arg\n"; }
 
         // R-VALUE
         /*Constructor for Node called by insert when the tree is empty*/
-        explicit Node(std::pair<const key_type, val_type> &&x) : pair_data{std::move(x)}, parent(nullptr) { std::cout << "r-value 1 arg" << std::endl; }
+        explicit Node(std::pair<const key_type, val_type>&& x) : pair_data{std::move(x)}, parent(nullptr) { std::cout << "r-value 1 arg" << std::endl; }
         /*Constructor for Node called by insert when the tree is no more empty, set in a proper way the parent pointer*/
-        Node(std::pair<const key_type, val_type> &&x, Node *p) : pair_data{std::move(x)}, parent{p} { std::cout << "r-value 2 arg" << std::endl; }
+        Node(std::pair<const key_type, val_type>&& x, Node *p) : pair_data{std::move(x)}, parent{p} { std::cout << "r-value 2 arg" << std::endl; }
 
         /*Destructor of Node*/
         ~Node() noexcept { std::cout << "Node destructor" << std::endl; }
@@ -44,7 +44,7 @@ class bst
 
     // COPY FUNCTION CALLED ITERATIVELY TO COPY ALL THE TREE
     /*copy function called iteratively to perform a deep copy of the tree when we use the copy constructor*/
-    void __copy(const std::unique_ptr<Node> &up)
+    void __copy(const std::unique_ptr<Node>& up)
     {
         if (up) // if unique pointer != empty (it contains a raw pointer)
         {
@@ -119,7 +119,7 @@ public:
      * @param x key of the node to be found
      * @returns an iteratro or end()
      */
-    iterator find(const key_type &x) noexcept
+    iterator find(const key_type& x) noexcept
     {
         for (iterator my_iterator{begin()}; my_iterator != end(); ++my_iterator)
         {
@@ -136,7 +136,7 @@ public:
      * @param x key of the node to be found
      * @returns a const_iteratro or end()
      */
-    const_iterator find(const key_type &x) const noexcept
+    const_iterator find(const key_type& x) const noexcept
     {
         for (const_iterator my_iterator{begin()}; my_iterator != end(); ++my_iterator)
         {
@@ -150,12 +150,12 @@ public:
 
     /**COPY AND MOVE SEMANTICS FOR THE BST*/
     /**move constructor (default because no raw pointers)*/
-    bst(bst &&) noexcept = default;
+    bst(bst&&) noexcept = default;
     /**move assignment (default because no raw pointers)*/
-    bst &operator=(bst &&) noexcept = default;
+    bst &operator=(bst&&) noexcept = default;
 
     /**Copy constructor for a deep copy*/
-    bst(const bst &x) : tree_size{}
+    bst(const bst& x) : tree_size{}
     {
         std::cout << "COPY CONSTRUCTOR" << std::endl;
         try
@@ -169,7 +169,7 @@ public:
         __copy(x.root_node);
     }
     /**Copy assignment, standard way*/
-    bst &operator=(const bst &x)
+    bst &operator=(const bst& x)
     {
         std::cout << "COPY ASSIGNMENT" << std::endl;
         root_node.reset(); // remember to release the memory we own
@@ -186,7 +186,7 @@ public:
      * @tparam P the type of pair
      */
     template <typename P>
-    std::pair<iterator, bool> _insert(P &&x) // forwarding is not a n r-value
+    std::pair<iterator, bool> _insert(P&& x) // forwarding is not an r-value
     {
         std::cout << "forwarding _insert" << std::endl;
         auto tmp = root_node.get();
@@ -196,7 +196,7 @@ public:
             {
                 if (!tmp->left)
                 {                                                       // if tmp->left == nullptr
-                    tmp->left.reset(new Node{std::forward<P>(x), tmp}); // we call the second constructor in which we set the parent pointer (l or r according o the type passed with forwarding)
+                    tmp->left.reset(new Node{std::forward<P>(x), tmp}); // we call the second constructor in which we set the parent pointer (l or r according to the type passed with forwarding)
                     ++tree_size;
                     iterator my_iterator{tmp->left.get()};
                     return std::pair<iterator, bool>{my_iterator, true}; // true because we insert a new node
@@ -210,10 +210,10 @@ public:
             {
                 if (!tmp->right) // if tmp-> right == nullptr
                 {
-                    tmp->right.reset(new Node{std::forward<P>(x), tmp}); // we call the second constructor in which we set the parent pointer (l or r according o the type passed with forwarding)
+                    tmp->right.reset(new Node{std::forward<P>(x), tmp}); // we call the second constructor in which we set the parent pointer (l or r according to the type passed with forwarding)
                     ++tree_size;
                     iterator my_iterator{tmp->right.get()};
-                    return std::pair<iterator, bool>{my_iterator, true}; // true becasue we insert a new node
+                    return std::pair<iterator, bool>{my_iterator, true}; // true because we insert a new node
                 }
                 else
                 {
@@ -227,17 +227,17 @@ public:
             }
         }
         // we insert the first node because the tree is empty
-        root_node.reset(new Node{std::forward<P>(x)}); // this time we call explicit node constructor (l or r ccording to the type passed with forwarding)
+        root_node.reset(new Node{std::forward<P>(x)}); // this time we call explicit node constructor (l or r according to the type passed with forwarding)
         ++tree_size;
         iterator my_iterator{root_node.get()};
-        return std::pair<iterator, bool>{my_iterator, true}; // true because we allocate a new node
+        return std::pair<iterator, bool>{my_iterator, true}; // true because we insert a new node
     }
 
     /** L-value insert
      * @param x pair key and value
      * @returns a pair of an iterator and a bool, true if the node has been allocated
      * */
-    std::pair<iterator, bool> insert(const std::pair<const key_type, val_type> &x)
+    std::pair<iterator, bool> insert(const std::pair<const key_type, val_type>& x)
     {
         std::cout << "insert with L" << std::endl;
         return _insert(x);
@@ -246,7 +246,7 @@ public:
      * @param x pair key and value
      * @returns a pair of an iterator and a bool, true if the node has been allocated
      * */
-    std::pair<iterator, bool> insert(std::pair<const key_type, val_type> &&x)
+    std::pair<iterator, bool> insert(std::pair<const key_type, val_type>&& x)
     {
         std::cout << "insert with R" << std::endl;
         return _insert(std::move(x));
