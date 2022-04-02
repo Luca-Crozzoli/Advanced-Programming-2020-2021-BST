@@ -653,34 +653,42 @@ int main()
     tree.insert(std::pair<int, int>(13, 40));
     std::cout << tree << std::endl;
 
+    /*
     // TESTING EMPLACE
-    // tree.emplace(5,400);
-    // std::cout << tree <<std::endl;
-
+       tree.emplace(5,400);
+       std::cout << tree <<std::endl;
+    */
+    
+    /*
     // TESTING CLEAR
-    // tree.clear();
-    // std::cout<<tree<<std::endl;
-
+       tree.clear();
+       std::cout<<tree<<std::endl;
+    */
+    
+    /*
     // TESTING FIND
-    // int key = 15;
-    // if((*tree.find(key)).first == key ){
-    //    std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
-    // }
-
+       int key = 15;
+       if((*tree.find(key)).first == key ){
+          std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
+       }
+    */
+    
+    /*
     // TESTING THE OPERATOR []
-    // int keyop = 15; //we search for a key which is not present, we simple add a new node with a default value!!
-    // auto value_L= tree[keyop]; //L value
-    // auto value_R = tree[6]; //R value
-    // std::cout<<"value_Lop[]:"<<value_L<<"  value_Rop[]:"<<value_R<<std::endl;
+       int keyop = 15; //we search for a key which is not present, we simple add a new node with a default value!!
+       auto value_L= tree[keyop]; //L value
+       auto value_R = tree[6]; //R value
+       std::cout<<"value_Lop[]:"<<value_L<<"  value_Rop[]:"<<value_R<<std::endl;
+    */
 
     /*
     //COPY SEMANTIC TEST
     //COPY CONSTRUCTOR
-    std::cout<<"TEST copy semantic usign tree"<<std::endl;
-    bst<int,int> copy_constructor_tree{tree};
+       std::cout<<"TEST copy semantic using tree"<<std::endl;
+       bst<int,int> copy_constructor_tree{tree};
     //COPY ASSIGNMENT
-    bst<int, int> copy_assignement_tree{};
-    copy_assignement_tree = tree;
+       bst<int, int> copy_assignement_tree{};
+       copy_assignement_tree = tree;
 
     std::cout<<"tree: \n"<<tree<<std::endl;
     std::cout<<"copy constructor tree: \n" << copy_constructor_tree <<std::endl;
@@ -690,21 +698,23 @@ int main()
 
     //MOVE SEMANTIC TEST
     //MOVE CONSTRUCTOR
-    std::cout<<"TEST move semantics"<<std::endl;
-    bst<int,int> move_constructor_tree{std::move(tree)};
-    std::cout<<"move constructor tree: \n" << move_constructor_tree <<std::endl; //REMEBER TO CHANGE THE NAME IF WE WANT TO TEST MOVE ASSIGNEMNT
-    std::cout<<"tree: \n"<<tree<<std::endl;
+       std::cout<<"TEST move semantics"<<std::endl;
+       bst<int,int> move_constructor_tree{std::move(tree)};
+       std::cout<<"move constructor tree: \n" << move_constructor_tree <<std::endl; //REMEBER TO CHANGE THE NAME IF WE WANT TO TEST MOVE ASSIGNEMNT
+       std::cout<<"tree: \n"<<tree<<std::endl;
 
     //MOVE ASSIGNMENT
-    bst<int, int> move_assignement_tree{};
-    move_assignement_tree = std::move(copy_constructor_tree); //USED A COPY CONSTRUCTOR
-    std::cout<< "move assignment tree: \n"<<move_assignement_tree<<std::endl;
-    std::cout<< "copy constructor tree: \n"<<copy_constructor_tree<<std::endl;
+       bst<int, int> move_assignement_tree{};
+       move_assignement_tree = std::move(copy_constructor_tree); //USED A COPY CONSTRUCTOR
+       std::cout<< "move assignment tree: \n"<<move_assignement_tree<<std::endl;
+       std::cout<< "copy constructor tree: \n"<<copy_constructor_tree<<std::endl;
     */
 
+    /*
     // TESTING ERASE
-    // tree.erase(6);
-    // std::cout << tree << std::endl;
+       tree.erase(6);
+       std::cout << tree << std::endl;
+    */
 
     return 0;
 }
