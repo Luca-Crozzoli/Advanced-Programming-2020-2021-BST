@@ -11,9 +11,9 @@ Implementation of a **template** binary search tree (BST).
 
 ## Short report
 ### What I understood
-- How to worte and how to use a Makefile
-- clarify the concepts introudced in the lectures
-- know something more about the alogrithms behind the BST
+- How to write and use a simple Makefile
+- Clarified the concepts introduced during lectures
+- Learned something more about the algorithms behind the BST
 
 
 
