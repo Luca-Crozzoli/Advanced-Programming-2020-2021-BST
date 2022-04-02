@@ -115,9 +115,9 @@ public:
     const_iterator cend() const noexcept { return const_iterator{nullptr}; };
 
     /** FIND
-     * find a given key. if the key is present, retuns an iterator to the proper node, end() otherwise
+     * find a given key. if the key is present, returns an iterator to the proper node, end() otherwise
      * @param x key of the node to be found
-     * @returns an iteratro or end()
+     * @returns an iterator or end()
      */
     iterator find(const key_type& x) noexcept
     {
@@ -132,9 +132,9 @@ public:
     };
 
     /** FIND
-     * find a given key. if the key is present, retuns an iterator to the proper node, end() otherwise
+     * find a given key. if the key is present, returns an iterator to the proper node, end() otherwise
      * @param x key of the node to be found
-     * @returns a const_iteratro or end()
+     * @returns a const_iterator or end()
      */
     const_iterator find(const key_type& x) const noexcept
     {
