@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <iostream>
-#include <iterator> // std::forward_iterator_tag;
+#include <iterator> // std::forward_iterator_tag
 #include <memory>   // std::unique_ptr
 #include <utility>  // std::move std::pair
 #include <vector>   // std::vector used to create a vector of pairs for the balance function
