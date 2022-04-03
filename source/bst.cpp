@@ -7,7 +7,7 @@
 #include "ap_error.h"
 
 /** BST
- * Class for the binary search tree. Inside itwe also defined a struct Node
+ * Class for the binary search tree. Inside it we also defined a struct Node
  * @tparam key_type type of the key to identifying each single node
  * @tparam val_type type of the value stored in each node
  * @tparam OP the operator used to compare the keys of the nodes (default std::less)
