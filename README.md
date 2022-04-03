@@ -2,8 +2,8 @@
 ## Binary search tree 
 
 Implementation of a **template** binary search tree (BST). 
-In the file exam_cpp.pdf there are the assignments for the project while
-in the [source] (https://github.com/Luca-Crozzoli/Advanced-Programming-2020-2021-BST/tree/main/source) folder there is the code.
+In the file [exam_cpp.pdf](https://github.com/Luca-Crozzoli/Advanced-Programming-2020-2021-BST/blob/main/exam_cpp.pdf) there are the assignments for the project while
+in the [source](https://github.com/Luca-Crozzoli/Advanced-Programming-2020-2021-BST/tree/main/source) folder there is the code.
 
 ## How to compile and run the code
 - `make` to compile the code
