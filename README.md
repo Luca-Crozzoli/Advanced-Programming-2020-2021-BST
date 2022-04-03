@@ -1,7 +1,9 @@
-# Advanced Programming Exam BST (A.Y 2020-2021)
-## Binary search tree
+# Advanced Programming Exam BST and Reverse Dictionary (A.Y 2020-2021)
+## Binary search tree 
 
 Implementation of a **template** binary search tree (BST). 
+In the file exam_cpp.pdf there are the assignments for the project while
+in the source folder there is the code
 
 ## How to compile and run the code
 - `make` to compile the code
@@ -14,6 +16,11 @@ Implementation of a **template** binary search tree (BST).
 - How to write and use a simple Makefile
 - Clarified the concepts introduced during lectures
 - Learned something more about the algorithms behind the BST
+
+## Reverse Dictionary
+
+Implementation of a revers dictionary. The description of the assignment
+and the solution is written in the file 
 
 
 
