@@ -20,7 +20,7 @@ in the source folder there is the code
 ## Reverse Dictionary
 
 Implementation of a revers dictionary. The description of the assignment
-and the solution is written in the file 
+and the solution is written in the file [python_exam.ipynb](https://github.com/Luca-Crozzoli/Advanced-Programming-2020-2021-BST/blob/main/python_exam.ipynb)
 
 
 
