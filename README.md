@@ -19,8 +19,8 @@ in the [source](https://github.com/Luca-Crozzoli/Advanced-Programming-2020-2021-
 
 ## Reverse Dictionary
 
-Implementation of a revers dictionary. The description of the assignment
-and the solution is written in the file [python_exam.ipynb](https://github.com/Luca-Crozzoli/Advanced-Programming-2020-2021-BST/blob/main/python_exam.ipynb)
+Implementation of a reverse dictionary. The description of the assignment
+and the solution are in the file [python_exam.ipynb](https://github.com/Luca-Crozzoli/Advanced-Programming-2020-2021-BST/blob/main/python_exam.ipynb)
 
 
 
