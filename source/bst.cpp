@@ -412,11 +412,11 @@ public:
                 return node_to_release->parent->left.release();
             }
 
-            return node_to_release->parent->right.release(); // otherwise the node is a right child, we relase the right pointer of the parent
+            return node_to_release->parent->right.release(); // otherwise the node is a right child, we release the right pointer of the parent
         };
 
         /** GET_LEFT_MOST_FROM_ROOT_SUBTREE LAMBDA
-         * function that returns a pointer to the left most node from a subtree with the root passed as argument
+         * function that returns a pointer to the leftmost node from a subtree with the root passed as argument
          * @param root_subtree the root of a subtree
          * @returns a raw pointer to the left_most node in the subtree with root root_subtree
          */
@@ -455,9 +455,9 @@ public:
         /** TRANSPLANT_TREE LAMBDA
          * function that substitutes a subtree with root root_subtree, with another subtree with root root_graft_subtree
          * according to the type of root_subtree determined by the get_root_subtree_type which provides
-         * the second argument for this function
+         * The second argument for this function
          * @param root_subtree the root subtree of the tree that has to be transplanted
-         * @param rst the root subree type
+         * @param rst the root subtree type
          * @param root_graft_subtree the root of the subtree to be grafted*/
         auto transplant_tree = [this](Node *root_subtree, root_subtree_type rst, Node *root_graft_subtree)
         {
@@ -490,11 +490,11 @@ public:
         {
             transplant_tree(remove, get_root_subtree_type(remove), remove->left.release());
         }
-        else // node "remove" have both left and right child
+        else // node "remove" has both left and right child
         {
             Node *left_most = get_left_most_from_root_subtree(remove->right.get());
             auto left_most_rst = get_root_subtree_type(left_most); /* We need to know the type of left_most node, if it is a right or left child.
-                                                                   Do that before the release of the node from its parent because after the release we can not access anymore the parent
+                                                                   Do that before the release of the node from its parent because after the release we can not access the parent anymore
                                                                    to establish the type of the node*/
             release_node(left_most);
 
@@ -553,7 +553,7 @@ public:
  * @tparam key_type type of the key to identifying each single node
  * @tparam val_type type of the value stored in each node
  * @tparam OP the operator used to compare the keys of the nodes (default std::less)
- * @tparam O Type of the object pointed by an instance of _Iterator. interseted in pair or const pair
+ * @tparam O Type of the object pointed by an instance of _Iterator. interested in pair or const pair
  */
 template <typename key_type, typename val_type, typename OP>
 template <typename O>
@@ -585,7 +585,7 @@ public:
         {
             return *this;
         }
-        else if (current->right) // if the current node has a right child go to the left most node from the right child
+        else if (current->right) // if the current node has a right child go to the leftmost node from the right child
         {
             current = current->right.get(); // update current
             while (current->left)
@@ -595,7 +595,7 @@ public:
         }
         // current = last left node -> return the parent
         // current = last right node -> you reach the end of the tree go back to parents until null pointer
-        else // If the current node doesn't have the right node the next node is the first ancestor of the current node, which left son is also an ancestor of the current
+        else // If the current node doesn't have the right node the next node is the first ancestor of the current node, the left son is also an ancestor of the current
         {
             node *tmp = current->parent;
 
@@ -650,69 +650,6 @@ int main()
     std::cout << tree << std::endl;
     tree.insert(std::pair<int, int>(13, 40));
     std::cout << tree << std::endl;
-
-    /*
-    // TESTING EMPLACE
-       tree.emplace(5,400);
-       std::cout << tree <<std::endl;
-    */
-    
-    /*
-    // TESTING CLEAR
-       tree.clear();
-       std::cout<<tree<<std::endl;
-    */
-    
-    /*
-    // TESTING FIND
-       int key = 15;
-       if((*tree.find(key)).first == key ){
-          std::cout << "there is a node wit the following key:"<< key <<" with value:"<<(*tree.find(key)).second<<std::endl;
-       }
-    */
-    
-    /*
-    // TESTING THE OPERATOR []
-       int keyop = 15; //we search for a key which is not present, we simple add a new node with a default value!!
-       auto value_L= tree[keyop]; //L value
-       auto value_R = tree[6]; //R value
-       std::cout<<"value_Lop[]:"<<value_L<<"  value_Rop[]:"<<value_R<<std::endl;
-    */
-
-    /*
-    //COPY SEMANTIC TEST
-    //COPY CONSTRUCTOR
-       std::cout<<"TEST copy semantic using tree"<<std::endl;
-       bst<int,int> copy_constructor_tree{tree};
-    //COPY ASSIGNMENT
-       bst<int, int> copy_assignement_tree{};
-       copy_assignement_tree = tree;
-
-    std::cout<<"tree: \n"<<tree<<std::endl;
-    std::cout<<"copy constructor tree: \n" << copy_constructor_tree <<std::endl;
-    std::cout<<"copy assignment tree: \n"<<copy_assignement_tree<<std::endl;
-
-
-
-    //MOVE SEMANTIC TEST
-    //MOVE CONSTRUCTOR
-       std::cout<<"TEST move semantics"<<std::endl;
-       bst<int,int> move_constructor_tree{std::move(tree)};
-       std::cout<<"move constructor tree: \n" << move_constructor_tree <<std::endl; //REMEBER TO CHANGE THE NAME IF WE WANT TO TEST MOVE ASSIGNEMNT
-       std::cout<<"tree: \n"<<tree<<std::endl;
-
-    //MOVE ASSIGNMENT
-       bst<int, int> move_assignement_tree{};
-       move_assignement_tree = std::move(copy_constructor_tree); //USED A COPY CONSTRUCTOR
-       std::cout<< "move assignment tree: \n"<<move_assignement_tree<<std::endl;
-       std::cout<< "copy constructor tree: \n"<<copy_constructor_tree<<std::endl;
-    */
-
-    /*
-    // TESTING ERASE
-       tree.erase(6);
-       std::cout << tree << std::endl;
-    */
 
     return 0;
 }
